@@ -16,8 +16,9 @@ export const s = StyleSheet.create({
         letterSpacing:0.5,
     },
     headingFirst:{
-        fontSize:28,
+        fontSize:25,
         color:'black',
+        fontWeight:'500'
     },
     headingSecond:{
         fontSize:12,

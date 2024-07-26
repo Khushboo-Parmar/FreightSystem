@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
-import { s } from '../../commonCSS/Style';
-
+import { useSelector } from 'react-redux';
 export default function SplashScreen({ navigation }) {
 
+  const user = useSelector(state => state.user.user);
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('Dashboard');
-      // navigation.replace('PhoneNoScreen');
-    }, 2000);
-    return () => clearTimeout(timer);
+    const checkLoginStatus = async () => {
+      if (user) {
+        navigation.replace('LoginDashboard');
+      } else {
+        navigation.replace('Dashboard');
+      }
+    };
+    checkLoginStatus();
   }, [navigation]);
 
   return (

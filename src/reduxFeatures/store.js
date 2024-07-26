@@ -1,17 +1,25 @@
-import { configureStore } from "@reduxjs/toolkit";
-import registerReducer from "./content/contentSlice";
-import userReducer from "./content/userReducer";
-// import getcomplaintsReducer from "./content/complaintsSlice";
-import phoneReducer from './content/phoneSlice'
-const store = configureStore({
-    reducer:{
-        register:registerReducer,
-        user: userReducer,
-        // complaints: getcomplaintsReducer,
-        phone: phoneReducer,
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import userReducer from './content/userReducer';
+import phoneReducer from './content/phoneSlice';
 
-    },
-  
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+};
+
+const rootReducer = combineReducers({
+  user: userReducer,
+  phone: phoneReducer,
 });
 
-export default store;
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const store = configureStore({
+  reducer: persistedReducer,
+});
+
+const persistor = persistStore(store);
+
+export { store, persistor };

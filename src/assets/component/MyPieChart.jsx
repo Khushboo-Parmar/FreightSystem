@@ -20,6 +20,13 @@ const MyPieChart = () => {
             legendFontColor: 'black',
             legendFontSize: responsiveFontSize(1.8),
         },
+        {
+            name: 'Cancled',
+            claims: 0,
+            color: '#D3D3D3',
+            legendFontColor: 'black',
+            legendFontSize: responsiveFontSize(1.8),
+        },
     ]);
 
     useEffect(() => {
@@ -53,6 +60,13 @@ const MyPieChart = () => {
                             name: 'Complete',
                             claims: result.status_counts.status_1_count,
                             color: '#2196F3',
+                            legendFontColor: 'black',
+                            legendFontSize: responsiveFontSize(1.8),
+                        },
+                        {
+                            name: 'Cancled',
+                            claims: 1,
+                            color: '#D3D3D3',
                             legendFontColor: 'black',
                             legendFontSize: responsiveFontSize(1.8),
                         },
@@ -109,25 +123,30 @@ const styles = StyleSheet.create({
 
     pieChart: {
         borderRadius: 16,
-        marginLeft: responsiveWidth(5)
+        marginLeft: responsiveWidth(18)
     },
     legendItem: {
         flexDirection: 'row',
         alignItems: 'center',
         marginVertical: responsiveHeight(0.5),
+        justifyContent: 'flex-start',
     },
     legendColorBox: {
         width: responsiveWidth(4),
         height: responsiveWidth(4),
         marginRight: responsiveWidth(2),
+        borderRadius: responsiveWidth(2),
     },
     legendText: {
         fontSize: responsiveFontSize(2),
         color: 'black',
+        marginLeft: responsiveWidth(2),
     },
     customLegend: {
         flexDirection: 'column',
-        alignItems: 'center',
+        // alignItems: 'center',
+        alignItems: 'flex-start',
+        marginLeft: responsiveWidth(5), // Add some margin to align with pie chart
     },
 });
 

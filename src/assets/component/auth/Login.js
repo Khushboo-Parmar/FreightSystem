@@ -118,7 +118,7 @@ const Login = () => {
                 </Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Enter your otp"
+                    placeholder="Enter your OTP"
                     placeholderTextColor="#aaa"
                     onChangeText={setOtp}
                     value={otp}
@@ -126,7 +126,7 @@ const Login = () => {
                 />
 
                 <TouchableOpacity onPress={handleResend}>
-                    <Text style={styles.buttonText2}>Resend otp</Text>
+                    <Text style={styles.buttonText2}>Resend OTP</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                     <Text style={styles.buttonText}>Login</Text>

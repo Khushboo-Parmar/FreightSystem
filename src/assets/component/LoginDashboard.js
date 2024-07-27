@@ -12,7 +12,7 @@ import MyPieChart from './MyPieChart';
 const LoginDashboard = () => {
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
     const user = useSelector(state => state.user.user);
-    console.warn('user=',user)
+    console.warn('user=', user)
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
@@ -70,21 +70,18 @@ const LoginDashboard = () => {
                 });
             }
         };
-
         fetchDashboardData();
     }, []);
 
     const handleLogout = async () => {
         try {
             dispatch(clearUser());
-            // await AsyncStorage.removeItem('email');
-            // await AsyncStorage.removeItem('password');
             Toast.show({
                 type: 'success',
                 text1: 'Logging out',
                 text2: 'Thank you!',
             });
-            navigation.navigate('Loginphone');
+            navigation.navigate('Dashboard');
         } catch (error) {
             console.error('Error during logout:', error);
             Toast.show({
@@ -115,10 +112,16 @@ const LoginDashboard = () => {
                                 <View style={styles.modalOverlay} />
                             </TouchableWithoutFeedback>
                             <View style={styles.modalContent}>
-                                <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                                <TouchableOpacity onPress={() => {
+                                    toggleModal();
+                                    navigation.navigate('Profile')
+                                }}>
                                     <Text style={styles.menuItem}>View Profile</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={handleLogout}>
+                                <TouchableOpacity onPress={() => {
+                                    toggleModal();
+                                    handleLogout();
+                                }}>
                                     <Text style={styles.menuItem}>Logout</Text>
                                 </TouchableOpacity>
                             </View>
@@ -141,9 +144,10 @@ const LoginDashboard = () => {
                                         <Text style={styles.claimdetailsText}>Total Amount</Text>
                                         <Text style={styles.claimdetailsamount}>{totalAmount !== null ? totalAmount : 'Loading...'}</Text>
                                     </View>
-                              
+
                                 </View>
                             </View>
+
                             <View style={styles.card}>
                                 <Text style={styles.welcomeText}>We are pleased to help you</Text>
                                 <View style={styles.buttonView}>
@@ -169,7 +173,8 @@ export default LoginDashboard;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: 'white',
+        // backgroundColor: '#f5f5f5',
     },
     bgImage: {
         height: responsiveHeight(28),
@@ -187,7 +192,7 @@ const styles = StyleSheet.create({
     greeting: {
         fontSize: responsiveFontSize(2.5),
         fontWeight: 'bold',
-        color:'black'
+        color: 'black'
     },
     profilepic: {
         width: responsiveWidth(10),
@@ -231,7 +236,7 @@ const styles = StyleSheet.create({
     },
     claimdetails: {
         flexDirection: 'row',
-        flexWrap:'wrap',
+        flexWrap: 'wrap',
         justifyContent: 'space-around',
     },
     claimdetailsViews: {
@@ -241,11 +246,11 @@ const styles = StyleSheet.create({
     claimdetailsText: {
         fontSize: responsiveFontSize(1.8),
         fontWeight: '500',
-        color:'black'
+        color: 'black'
     },
     claimdetailsamount: {
         fontSize: responsiveFontSize(1.8),
-         color:'black'
+        color: 'black'
     },
     welcomeText: {
         fontSize: responsiveFontSize(2),

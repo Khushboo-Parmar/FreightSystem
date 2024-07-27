@@ -10,7 +10,6 @@ const ClaimHistory = () => {
     const navigation = useNavigation();
     const user = useSelector(state => state.user.user);
     const userId = user.id;
-    console.warn('user id', userId);
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -20,7 +19,7 @@ const ClaimHistory = () => {
             setLoading(true);
             try {
                 const token = await AsyncStorage.getItem('token');
-                console.warn(token);
+  
                 if (!token) {
                     throw new Error("Token not found");
                 }
@@ -74,12 +73,11 @@ const ClaimHistory = () => {
                 <TouchableOpacity
                     key={complaint.search_id}
                     style={styles.card}
-                    onPress={() => navigation.navigate('ComplainDetailsStatus', { complaint })}
                 >
                     <View style={styles.cardContent}>
                           <Image
                         style={styles.productImage}
-                        source={{ uri: complaint.invoice_image_url }} 
+                        source={{ uri: complaint.invoice_image_url}} 
                     />
                         <View style={styles.textContainer}>
                             <Text style={styles.text}>Purchase Date: {complaint.purchase_date}</Text>
@@ -88,6 +86,7 @@ const ClaimHistory = () => {
                             <Text style={styles.text}>Total Amount: {complaint.total_amount}</Text>
                             <Text style={styles.text}>Freight Amount: {complaint.freight_amount}</Text>
                             <Text style={styles.text}>Search ID: {complaint.search_id}</Text>
+                            {/* <Text style={styles.text}>why cancel: {complaint.cancled}</Text> */}
                             <Text style={styles.text}>Status: {getStatusText(complaint.status)}</Text>
                         </View>
                     </View>
@@ -116,6 +115,7 @@ const ClaimHistory = () => {
                 return 'Pending';
             case '1':
                 return 'Completed';
+                
             default:
                 return 'Unknown';
         }

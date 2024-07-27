@@ -5,7 +5,6 @@ import SplashScreen from './splash/SplashScreen';
 import Dashboard from './Dashboard';
 import LoginDashboard from './LoginDashboard';
 import Login from './auth/Login';
-import ComplainDetailsStatus from './complain/ComplainDetailsStatus';
 import SearchStatus from './SearchStatus';
 import Profile from './profile/Profile';
 import SignUp from './auth/SignUp';
@@ -23,14 +22,13 @@ const AppNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SplashScreen">
   <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+      <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
         <Stack.Screen name="PhoneNoScreen" component={PhoneNoScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OtpScreen" component={OtpScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
         <Stack.Screen name="ClaimForm" component={ClaimForm} options={{ headerShown: false }} />
         <Stack.Screen name="ClaimHistory" component={ClaimHistory} options={{ headerShown: false }} />
         <Stack.Screen name="SearchStatus" component={SearchStatus} options={{ headerShown: false }} />
-        <Stack.Screen name="ComplainDetailsStatus" component={ComplainDetailsStatus} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="LoginDashboard" component={LoginDashboard} options={{ headerShown: false }} />

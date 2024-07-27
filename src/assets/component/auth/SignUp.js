@@ -6,11 +6,10 @@ import DocumentPicker from 'react-native-document-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
-
+import Toast from 'react-native-toast-message';
 const SignUpForm = () => {
     const route = useRoute();
     const { userId } = route.params;
-
     const phoneNumber = useSelector(state => state.phone.phoneNumber);
 
     const [partnerName, setPartnerName] = useState('');
@@ -25,7 +24,10 @@ const SignUpForm = () => {
 
     const handleFileUpload = async () => {
         if (!file) {
-            Alert.alert('Error', 'Please select a file first');
+            Toast.show({
+                type: 'Error',
+                text1: 'Please select a file first',
+            });
             return null;
         }
 
@@ -49,12 +51,19 @@ const SignUpForm = () => {
                 setFileId(data.data.file_id);
                 return data.data.file_id;
             } else {
-                Alert.alert('Error', data.message || 'File upload failed');
+                Toast.show({
+                    type: 'error',
+                    text1: 'File upload failed',
+                    text2: data.message,
+                });
                 return null;
             }
         } catch (error) {
             console.error('Error:', error);
-            Alert.alert('Failed to upload the file. Please check your network connection and try again.');
+            Toast.show({
+                type: 'error',
+                text1: 'Failed to upload the file. Please check your network connection and try again',
+            });
             return null;
         }
     };
@@ -83,13 +92,25 @@ const SignUpForm = () => {
             const data = await response.json();
             if (data.status === 200) {
                 console.log('Success:', data);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Sign up successful',
+                });
                 navigation.navigate('Loginphone');
             } else {
-                Alert.alert('Error', data.message || 'Sign up failed');
+                Toast.show({
+                    type: 'error',
+                    text1: 'Sign up failed',
+                    text2: data.message,
+                });
             }
         } catch (error) {
             console.error('Error:', error);
-            Alert.alert('Failed to submit the form. Please check your network connection and try again.');
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to submit the form. Please check your network connection and try again.',
+            });
         }
     };
 
@@ -134,6 +155,9 @@ const SignUpForm = () => {
         fetchCityList();
     }, []);
 
+    const removeFile = () => {
+        setFile(null);
+    };
     return (
         <View style={styles.container}>
             <Image style={styles.bgLogo} source={require('../../Images/logo.png')} />
@@ -192,6 +216,7 @@ const SignUpForm = () => {
                         placeholder="CITY"
                         itemTextStyle={styles.itemTextStyle}
                         placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
                         value={city}
                         onChange={item => {
                             setCity(item.value);
@@ -205,15 +230,23 @@ const SignUpForm = () => {
                 {file && (
                     <View style={styles.imageContainer}>
                         {file.type.includes('image') ? (
+                            <>
                             <Image
                                 source={{ uri: file.uri }}
                                 style={styles.uploadedImage}
                                 resizeMode="cover"
                             />
+                            <TouchableOpacity style={styles.removeButton} onPress={removeFile}>
+                                    <Icon name="times-circle" size={15} color="red" />
+                                </TouchableOpacity>
+                                </>
                         ) : (
                             <View style={styles.pdfContainer}>
                                 <Icon name="file-pdf-o" size={50} color="red" />
                                 <Text style={styles.pdfText}>{file.name}</Text>
+                                <TouchableOpacity style={styles.removeButton} onPress={removeFile}>
+                                    <Icon name="times-circle" size={15} color="red" />
+                                </TouchableOpacity>
                             </View>
                         )}
                     </View>
@@ -254,7 +287,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
         fontSize: responsiveFontSize(1.8),
         color: 'black',
-        // textTransform: 'uppercase',
     },
     icon: {
         marginRight: responsiveWidth(2.5),
@@ -284,6 +316,7 @@ const styles = StyleSheet.create({
         marginRight: responsiveWidth(2),
         borderWidth: 1,
         borderColor: '#ccc',
+        position:'relative',
     },
     pdfContainer: {
         flexDirection: 'row',
@@ -305,6 +338,26 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: responsiveFontSize(2),
         textAlign: 'center',
+    },
+    itemTextStyle:{
+        color:'black'
+    },
+    removeButton: {
+        position: 'absolute',
+        top:responsiveHeight(0.5),
+        left: responsiveWidth(14),
+        backgroundColor: 'rgba(255,255,255,0.7)',
+        borderRadius: 10,
+        width: 20,
+        height: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    placeholderStyle:{
+        color:'grey'
+    },
+    selectedTextStyle: {
+        color: 'black',
     },
 });
 

@@ -33,14 +33,25 @@ const Loginphone = () => {
 
             if (response.status === 200) {
                 dispatch(setPhoneNumber(phoneNumberinput));
-                console.log('Dispatched phone number:', phoneNumberinput);
                 navigation.navigate('Login');
+                Toast.show({
+                    type: 'success',
+                    text1: 'Verification code sent successfully!',
+                  });
             } else {
-                alert('Failed to send verification code. Please try again.');
+                Toast.show({
+                    type: 'error',
+                    text1: 'Failed to send verification code',
+                    text2: 'Please try again.',
+                  });
             }
         } catch (error) {
             console.error('Error sending verification code:', error);
-            alert('Failed to send verification code. Please try again.');
+            Toast.show({
+                type: 'error',
+                text1: 'Failed to send verification code',
+                text2: 'Please try again.',
+              });
         }
     };
 

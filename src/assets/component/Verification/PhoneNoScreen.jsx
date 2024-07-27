@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPhoneNumber } from '../../../reduxFeatures/content/phoneSlice';
-
+import Toast from 'react-native-toast-message';
 const PhoneNoScreen = () => {
   const navigation = useNavigation();
   const [phoneNumberinput, setPhoneNumberInput] = useState('');
@@ -25,16 +25,27 @@ const PhoneNoScreen = () => {
       const data = await response.json();
 
       if (response.status === 200) {
-        console.warn('Navigation to OtpScreen');
+
         dispatch(setPhoneNumber(phoneNumberinput));
-   
+        Toast.show({
+          type: 'success',
+          text1: 'Verification code sent successfully!',
+        });
         navigation.navigate('OtpScreen');
       } else {
-        alert('Failed to send verification code. Please try again.');
+       Toast.show({
+        type: 'error',
+        text1: 'Failed to send verification code',
+        text2: 'Please try again.',
+      });
       }
     } catch (error) {
       console.error('Error sending verification code:', error);
-      alert('Failed to send verification code. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to send verification code',
+        text2: 'Please try again.',
+      });
     }
   };
 

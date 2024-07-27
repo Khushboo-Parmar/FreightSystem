@@ -5,7 +5,8 @@ import Toast from 'react-native-toast-message';
 import DocumentPicker from 'react-native-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
+
 const UpdateProfile = ({ navigation }) => {
     const user = useSelector(state => state.user.user);
     const dispatch = useDispatch();
@@ -17,7 +18,7 @@ const UpdateProfile = ({ navigation }) => {
         address: user.address,
     });
     const [file, setFile] = useState(null);
-    const [fileUri, setFileUri] = useState(user.profile_picture); // Assuming profile_picture is a field in user object
+    const [fileUri, setFileUri] = useState(user.file);
 
     const handleChange = (field, value) => {
         setForm({ ...form, [field]: value });
@@ -41,13 +42,19 @@ const UpdateProfile = ({ navigation }) => {
             if (DocumentPicker.isCancel(err)) {
                 console.log('User cancelled document picking');
             } else {
-                console.log('Error picking document:', err);
+                console.error('Error picking document:', err);
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'An error occurred while picking the document. Please try again..',
+                });
             }
         }
     };
+
     const handleSubmit = async () => {
-        let profilePictureId = user.profile_picture_id;
-    
+        let profilePictureId = user.file;
+
         if (file) {
             const formData = new FormData();
             formData.append('file', {
@@ -55,32 +62,40 @@ const UpdateProfile = ({ navigation }) => {
                 name: file.name,
                 type: file.type,
             });
-    
+
             try {
                 const uploadResponse = await fetch(`${process.env.BASE_URL}file-Upload`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'multipart/form-data',
-
                     },
                     body: formData,
                 });
-    
+
                 const uploadData = await uploadResponse.json();
-    
+
                 if (uploadResponse.status === 200) {
                     profilePictureId = uploadData.data.file_id;
                 } else {
-                    Alert.alert('Error', uploadData.message || 'File upload failed');
+                    Toast.show({
+                        type: 'Error',
+                        text1: 'File upload failed',
+                        text2: uploadData.message,
+                    });
                     return;
                 }
             } catch (error) {
                 console.error('Error uploading file:', error);
-                Alert.alert('Failed to upload the file. Please check your network connection and try again.');
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Failed to upload the file. Please check your network connection and try again.',
+                });
+             
                 return;
             }
         }
-    
+
         try {
             const token = await AsyncStorage.getItem('token');
             const response = await fetch(`${process.env.BASE_URL}update-profile`, {
@@ -98,11 +113,11 @@ const UpdateProfile = ({ navigation }) => {
                     file_id: profilePictureId
                 }),
             });
-    
+
             const data = await response.json();
-    
+
             if (response.status === 200) {
-                dispatch({ type: 'updateUser', payload: { ...form, profile_picture_id: profilePictureId } });
+                dispatch({ type: 'updateUser', payload: { ...form, profilePictureId} });
                 Toast.show({
                     type: 'success',
                     text1: 'Profile updated successfully',
@@ -124,27 +139,32 @@ const UpdateProfile = ({ navigation }) => {
             });
         }
     };
-    
+
+    const iconMapping = {
+        name: 'user',
+        email: 'envelope',
+        phone: 'phone',
+        city: 'map-marker',
+        address: 'address-book'
+    };
 
     return (
         <View style={styles.container}>
-            <View >
-            <Image source={{ uri: fileUri }} style={styles.profileImage} />
-            
-            <TouchableOpacity style={styles.uploadButton} onPress={handleFileUpload}>
-                <FontAwesome name="pencil" size={25} color="black" />
-            </TouchableOpacity>
+            <View style={styles.profileSection}>
+                <Image source={{ uri: fileUri }} style={styles.profileImage} />
+                <TouchableOpacity style={styles.uploadButton} onPress={handleFileUpload}>
+                    <FontAwesome name="pencil" size={responsiveFontSize(3)} color="white" />
+                </TouchableOpacity>
             </View>
 
             {Object.keys(form).map((key) => (
-
                 <View key={key} style={styles.inputContainer}>
-                    <Text style={styles.label}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+                    <FontAwesome name={iconMapping[key]} size={responsiveFontSize(2.5)} style={styles.icon} />
                     <TextInput
                         value={form[key]}
                         onChangeText={(value) => handleChange(key, value)}
                         placeholder={`Enter ${key}`}
-                        placeholderTextColor='grey'
+                        placeholderTextColor='black'
                         style={styles.input}
                     />
                 </View>
@@ -159,53 +179,93 @@ const UpdateProfile = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        padding: responsiveWidth(5),
         backgroundColor: 'white',
+    },
+    profileSection: {
+        alignItems: 'center',
+        marginBottom: responsiveHeight(3),
+        position: 'relative',
     },
     profileImage: {
         width: responsiveWidth(30),
         height: responsiveHeight(15),
-        borderRadius: 50,
-        borderColor:'black',
-        alignSelf: 'center',
-        marginBottom: 20,
-        position:'relative',
-        borderWidth:1,
-        resizeMode:'contain'
+        borderRadius: responsiveWidth(15),
+        borderColor: 'red',
+        borderWidth: 1,
+        resizeMode: 'cover',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5,
     },
     uploadButton: {
+        position: 'absolute',
+        bottom: responsiveHeight(1),
+        right: responsiveWidth(25),
+        backgroundColor: '#ee1d23',
+        padding: responsiveWidth(2),
+        borderRadius: responsiveWidth(10),
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5,
         alignItems: 'center',
-        position:'absolute',
-        bottom:responsiveHeight(2),
-        left:responsiveWidth(50),
-    },
-    uploadButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
+        justifyContent: 'center',
     },
     inputContainer: {
-        marginBottom: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: responsiveHeight(2),
+        borderColor: 'grey',
+        borderWidth: 1,
+        borderRadius: responsiveWidth(2),
+        padding: responsiveWidth(3),
+        backgroundColor: 'white',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 3,
+
     },
-    label: {
-        fontSize: 16,
-        fontWeight: 'bold',
+    icon: {
+        marginRight: responsiveWidth(2),
+        color: 'black',
     },
     input: {
-        borderWidth: 1,
-        borderRadius: 5,
-        padding: 10,
-        fontSize: 16,
+        flex: 1,
+        fontSize: responsiveFontSize(2),
+        color: "black"
     },
     btn: {
         backgroundColor: '#ee1d23',
-        padding: 15,
-        borderRadius: 5,
+        padding: responsiveHeight(2),
+        borderRadius: responsiveWidth(2),
         alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5,
     },
     btnText: {
         color: 'white',
-        fontSize: 16,
+        fontSize: responsiveFontSize(2.2),
         fontWeight: 'bold',
     },
 });

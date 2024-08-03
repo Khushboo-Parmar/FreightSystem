@@ -1,4 +1,4 @@
-package com.testapp
+package com.freightsystem
 
 import android.app.Application
 import com.facebook.react.PackageList

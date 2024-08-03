@@ -12,19 +12,21 @@ const Profile = () => {
     const handleEdit = async () => {
         navigation.navigate('UpdateProfile');
     }
-
+console.log('p user', user)
     return (
         <View style={styles.container}>
+                  
             {user && (
                 <>
                     <View style={styles.curve}>
-            
                         <Image
                         style={styles.profilepic}
                         source={{ uri: user?.file }} 
                     />
                     </View>
-
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+    <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
+</TouchableOpacity>
                     <View style={styles.infoContainer}>
                         <View style={styles.infoBox}>
                             <View style={styles.infoIcon}>
@@ -46,7 +48,7 @@ const Profile = () => {
 
                         <View style={styles.infoBox}>
                             <View style={styles.infoIcon}>
-                                <FontAwesome name="building" size={25} color="black" />
+                                <FontAwesome name="address-book" size={25} color="black" />
                             </View>
                             <View style={styles.infoDetail}>
                                 <Text style={styles.infoDetailText}>{user.address}</Text>
@@ -55,7 +57,7 @@ const Profile = () => {
 
                         <View style={styles.infoBox}>
                             <View style={styles.infoIcon}>
-                                <FontAwesome name="building" size={25} color="black" />
+                                <FontAwesome name="map-marker" size={25} color="black" />
                             </View>
                             <View style={styles.infoDetail}>
                                 <Text style={styles.infoDetailText}>{user.city}</Text>
@@ -108,7 +110,7 @@ const styles = StyleSheet.create({
         width: responsiveWidth(28),
         borderRadius: responsiveWidth(14),
         borderWidth: 2,
-        borderColor: '#fff',
+        borderColor: 'red',
         top: responsiveHeight(15),
         left: (responsiveWidth(100) - responsiveWidth(28)) / 2,
     },
@@ -186,4 +188,24 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         color: 'black',
     },
+    backButton: {
+        marginLeft: responsiveWidth(1),
+        width: responsiveWidth(10),
+        // backgroundColor: '#3c3c3c',
+        height: responsiveHeight(5),
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position:'absolute',
+        Top:responsiveHeight(2),
+        left:responsiveWidth(1),
+    },
+    title: {
+        fontSize: responsiveFontSize(2),
+        fontWeight: 'bold',
+        textAlign: 'center',
+        // marginBottom: responsiveHeight(2),
+        color: 'black',
+    },
+    
 });

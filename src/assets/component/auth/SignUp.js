@@ -7,6 +7,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
+import Recaptcha from 'react-native-recaptcha-that-works';
+
 const SignUpForm = () => {
     const route = useRoute();
     const { userId } = route.params;
@@ -18,8 +20,12 @@ const SignUpForm = () => {
     const [city, setCity] = useState('');
     const [file, setFile] = useState(null);
     const [file_id, setFileId] = useState('');
-    const [cityList, setCityList] = useState([]);
     const [email, setEmail] = useState('');
+    const [state, setState] = useState('');
+    const [stateList, setStateList] = useState([]);
+
+    const [captchaVerified, setCaptchaVerified] = useState(false);
+
     const navigation = useNavigation();
 
     const handleFileUpload = async () => {
@@ -77,6 +83,7 @@ const SignUpForm = () => {
         formData.append('gst_no', gstNo);
         formData.append('address', address);
         formData.append('city', city);
+        formData.append('state', state);
         formData.append('user_id', userId);
         formData.append('file_id', uploadedFileId);
         formData.append('email', email);
@@ -137,27 +144,54 @@ const SignUpForm = () => {
     };
 
     useEffect(() => {
-        const fetchCityList = async () => {
+        const fetchStateList = async () => {
             try {
-                const response = await fetch(`${process.env.BASE_URL}city-name`);
+                const response = await fetch(`${process.env.BASE_URL}state-list`);
                 const data = await response.json();
-                const cityNames = data.map(item => ({
-                    label: item.city_name,
+                const StateNames = data.map(item => ({
+                    label: item.state,
                     value: item.id,
                 }));
 
-                setCityList(cityNames);
+                setStateList(StateNames);
             } catch (error) {
                 console.error('Error fetching city list:', error.message);
             }
         };
 
-        fetchCityList();
+        fetchStateList();
     }, []);
+    // useEffect(() => {
+    //     const fetchCityList = async () => {
+    //         try {
+    //             const response = await fetch(`${process.env.BASE_URL}city-name`);
+    //             const data = await response.json();
+    //             const cityNames = data.map(item => ({
+    //                 label: item.city_name,
+    //                 value: item.id,
+    //             }));
+
+    //             setCityList(cityNames);
+    //         } catch (error) {
+    //             console.error('Error fetching city list:', error.message);
+    //         }
+    //     };
+
+    //     fetchCityList();
+    // }, []);
 
     const removeFile = () => {
         setFile(null);
     };
+
+
+    // const handleCaptchaVerify = (token) => {
+    //     // Handle CAPTCHA token verification with your server here
+    //     setCaptchaVerified(true);
+    //     console.log('Captcha token:', token);
+    // };
+
+
     return (
         <View style={styles.container}>
             <Image style={styles.bgLogo} source={require('../../Images/logo.png')} />
@@ -207,25 +241,35 @@ const SignUpForm = () => {
                 </View>
                 <View style={[styles.inputContainer, { marginLeft: responsiveWidth(2) }]}>
                     <Icon name="map-marker" size={18} color="#ee1d23" style={styles.icon} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="CITY"
+                        value={city}
+                        onChangeText={setCity}
+                        placeholderTextColor="grey"
+                    />
+                </View>
+                <View style={[styles.inputContainer, { marginLeft: responsiveWidth(2) }]}>
+                    <Icon name="map-marker" size={18} color="#ee1d23" style={styles.icon} />
 
                     <Dropdown
                         style={styles.input}
-                        data={cityList}
+                        data={stateList}
                         labelField="label"
                         valueField="value"
-                        placeholder="CITY"
+                        placeholder="STATE"
                         itemTextStyle={styles.itemTextStyle}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
-                        value={city}
+                        value={state}
                         onChange={item => {
-                            setCity(item.value);
+                            setState(item.value);
                         }}
                     />
                 </View>
 
                 <TouchableOpacity style={styles.uploadButton} onPress={handleShopDocumentUpload}>
-                    <Text style={styles.uploadButtonText}>Upload Shop Images/PDFs</Text>
+                    <Text style={styles.uploadButtonText}>Upload Shop Images</Text>
                 </TouchableOpacity>
                 {file && (
                     <View style={styles.imageContainer}>
@@ -244,13 +288,20 @@ const SignUpForm = () => {
                             <View style={styles.pdfContainer}>
                                 <Icon name="file-pdf-o" size={50} color="red" />
                                 <Text style={styles.pdfText}>{file.name}</Text>
-                                <TouchableOpacity style={styles.removeButton} onPress={removeFile}>
+                                <TouchableOpacity style={styles.removeButtonpdf} onPress={removeFile}>
                                     <Icon name="times-circle" size={15} color="red" />
                                 </TouchableOpacity>
                             </View>
                         )}
                     </View>
                 )}
+
+{/* <Recaptcha
+                    siteKey="YOUR_RECAPTCHA_SITE_KEY" // Replace with your reCAPTCHA site key
+                    onVerify={handleCaptchaVerify}
+                    onExpire={() => setCaptchaVerified(false)}
+                    size="normal"
+                />  */}
                 <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
                     <Text style={styles.signupButtonText}>Sign Up</Text>
                 </TouchableOpacity>
@@ -321,6 +372,9 @@ const styles = StyleSheet.create({
     pdfContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent:'flex-start',
+        gap:responsiveWidth(2),
+
     },
     pdfText: {
         marginLeft: responsiveWidth(2),
@@ -353,12 +407,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    removeButtonpdf: {
+        backgroundColor: 'rgba(255,255,255,0.7)',
+        borderRadius: 10,
+        width: 20,
+        height: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     placeholderStyle:{
         color:'grey'
     },
     selectedTextStyle: {
         color: 'black',
     },
+    bgLogo:{
+        height:responsiveHeight(25),
+        width:responsiveWidth('100'),
+        
+    }
 });
 
 export default SignUpForm;

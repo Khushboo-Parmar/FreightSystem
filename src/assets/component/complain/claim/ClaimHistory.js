@@ -5,7 +5,11 @@ import { useSelector } from 'react-redux';
 import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
+import placeholderImg from '../../../Images/placeImg.jpg';
+
+const placeholderImage = placeholderImg;
 const ClaimHistory = () => {
     const navigation = useNavigation();
     const user = useSelector(state => state.user.user);
@@ -19,7 +23,7 @@ const ClaimHistory = () => {
             setLoading(true);
             try {
                 const token = await AsyncStorage.getItem('token');
-  
+
                 if (!token) {
                     throw new Error("Token not found");
                 }
@@ -37,10 +41,8 @@ const ClaimHistory = () => {
                 }
 
                 const data = await response.json();
-                console.warn('data', data)
                 if (response.ok) {
                     setComplaints(data);
-                    console.log('data complaints',complaints)
                 } else {
                     throw new Error("Invalid response structure");
                 }
@@ -66,37 +68,82 @@ const ClaimHistory = () => {
             labelStyle={{ color: 'black', fontSize: responsiveFontSize(1.2), fontWeight: '500' }}
         />
     );
-
-    const renderComplaints = (status) => (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-            {complaints.filter(complaint => complaint.status === status).map(complaint => (
-                <TouchableOpacity
-                    key={complaint.search_id}
-                    style={styles.card}
-                >
-                    <View style={styles.cardContent}>
-                          <Image
-                        style={styles.productImage}
-                        source={{ uri: complaint.invoice_image_url}} 
-                    />
-                        <View style={styles.textContainer}>
-                            <Text style={styles.text}>Purchase Date: {complaint.purchase_date}</Text>
-                            <Text style={styles.text}>Distributor Name: {complaint.distributor_name}</Text>
-                            <Text style={styles.text}>Invoice No: {complaint.invoice_no}</Text>
-                            <Text style={styles.text}>Total Amount: {complaint.total_amount}</Text>
-                            <Text style={styles.text}>Freight Amount: {complaint.freight_amount}</Text>
-                            <Text style={styles.text}>Search ID: {complaint.search_id}</Text>
-                            {/* <Text style={styles.text}>why cancel: {complaint.cancled}</Text> */}
-                            <Text style={styles.text}>Status: {getStatusText(complaint.status)}</Text>
-                        </View>
+    const renderComplaints = (status) => {
+        const filteredComplaints = complaints.filter(complaint => complaint.status === status);
+        return (
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                {filteredComplaints.length === 0 ? (
+                    <View style={styles.noDataContainer}>
+                        <Image
+                            style={styles.noDataImage}
+                            // source={{ uri: placeholderImage }}
+                            source={require('../../../Images/placeImg.jpg')}
+                        />
+                        <Text style={styles.noDataText}>No complaints found.</Text>
                     </View>
-                </TouchableOpacity>
-            ))}
-        </ScrollView>
-    );
+                ) : (
+                    filteredComplaints.map(complaint => (
+                        <TouchableOpacity
+                            key={complaint.search_id}
+                            style={styles.card}
+                        >
+                            <View style={styles.cardContent}>
+                                <Image
+                                    style={styles.productImage}
+                                    source={{ uri: complaint.invoice_image_url }}
+                                // source={{ uri: complaint.invoice_image_url || placeholderImage }}
+                                />
+                                <View style={styles.textContainer}>
+                                    <Text style={styles.text}>Purchase Date: {complaint.purchase_date}</Text>
+                                    <Text style={styles.text}>Distributor Name: {complaint.distributor_name}</Text>
+                                    <Text style={styles.text}>Product Name: {complaint.product_name}</Text>
+                                    <Text style={styles.text}>Invoice No: {complaint.invoice_no}</Text>
+                                    <Text style={styles.text}>Total Amount: {complaint.total_amount}</Text>
+                                    <Text style={styles.text}>Freight Amount: {complaint.freight_amount}</Text>
+                                    <Text style={styles.text}>Search ID: {complaint.search_id}</Text>
+                                    {/* <Text style={styles.text}>why cancel: {complaint.cancled}</Text> */}
+                                    <Text style={styles.text}>Status: {getStatusText(complaint.status)}</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    ))
+                )}
+            </ScrollView>
+        );
+    };
 
-    const FirstRoute = () => renderComplaints('0'); 
-    const FourthRoute = () => renderComplaints('1'); 
+    // const renderComplaints = (status) => (
+    //     <ScrollView contentContainerStyle={styles.scrollContainer}>
+
+    //         {complaints.filter(complaint => complaint.status === status).map(complaint => (
+    //             <TouchableOpacity
+    //                 key={complaint.search_id}
+    //                 style={styles.card}
+    //             >
+    //                 <View style={styles.cardContent}>
+    //                     <Image
+    //                         style={styles.productImage}
+    //                         source={{ uri: complaint.invoice_image_url }}
+    //                     />
+    //                     <View style={styles.textContainer}>
+    //                         <Text style={styles.text}>Purchase Date: {complaint.purchase_date}</Text>
+    //                         <Text style={styles.text}>Distributor Name: {complaint.distributor_name}</Text>
+    //                         <Text style={styles.text}>Product Name: {complaint.product_name}</Text>
+    //                         <Text style={styles.text}>Invoice No: {complaint.invoice_no}</Text>
+    //                         <Text style={styles.text}>Total Amount: {complaint.total_amount}</Text>
+    //                         <Text style={styles.text}>Freight Amount: {complaint.freight_amount}</Text>
+    //                         <Text style={styles.text}>Search ID: {complaint.search_id}</Text>
+    //                         {/* <Text style={styles.text}>why cancel: {complaint.cancled}</Text> */}
+    //                         <Text style={styles.text}>Status: {getStatusText(complaint.status)}</Text>
+    //                     </View>
+    //                 </View>
+    //             </TouchableOpacity>
+    //         ))}
+    //     </ScrollView>
+    // );
+
+    const FirstRoute = () => renderComplaints('0');
+    const FourthRoute = () => renderComplaints('1');
 
     const [index, setIndex] = useState(0);
     const [routes] = useState([
@@ -110,12 +157,12 @@ const ClaimHistory = () => {
     });
 
     const getStatusText = (status) => {
-        switch(status) {
+        switch (status) {
             case '0':
                 return 'Pending';
             case '1':
                 return 'Completed';
-                
+
             default:
                 return 'Unknown';
         }
@@ -123,7 +170,15 @@ const ClaimHistory = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Claim History</Text>
+            <View style={{ display: 'flex', flexDirection: "row", alignItems:"center", justifyContent:'flex-start', gap:responsiveWidth(25) }}>
+
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.title}>Claim History</Text>
+
+            </View>
+
             {loading ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#ee1d23" />
@@ -155,11 +210,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         paddingTop: responsiveHeight(2),
     },
+    backButton: {
+        marginLeft: responsiveWidth(2),
+        width: responsiveWidth(10),
+        backgroundColor: '#3c3c3c',
+        height: responsiveHeight(5),
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     title: {
         fontSize: responsiveFontSize(2),
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: responsiveHeight(2),
+        // marginBottom: responsiveHeight(2),
         color: 'black',
     },
     loadingContainer: {
@@ -202,8 +266,9 @@ const styles = StyleSheet.create({
         width: responsiveWidth(20),
         height: responsiveWidth(30),
         borderRadius: 10,
-        resizeMode :'contain',
+        resizeMode: 'contain',
     },
+
     textContainer: {
         marginLeft: responsiveWidth(4),
         flex: 1,
@@ -233,4 +298,20 @@ const styles = StyleSheet.create({
         fontSize: responsiveFontSize(1.8),
         textAlign: 'center',
     },
+    noDataContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+        padding: responsiveWidth(4),
+    },
+    noDataImage: {
+        width: responsiveWidth(50),
+        height: responsiveWidth(50),
+        resizeMode: 'contain',
+    },
+    noDataText: {
+        fontSize: responsiveFontSize(1.8),
+        color: '#666',
+        marginTop: responsiveHeight(2),
+    }
 });

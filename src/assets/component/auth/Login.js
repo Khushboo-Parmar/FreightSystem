@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Switch } from "react-native";
-import { s } from '../../commonCSS/Style';
+import React, { useState, useRef  } from "react";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from "react-native-responsive-dimensions";
@@ -8,13 +7,14 @@ import { setUser } from "../../../reduxFeatures/content/userReducer";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-
+import { s } from '../../commonCSS/Style';
 const Login = () => {
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
-    const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState('');
     const navigation = useNavigation();
     const dispatch = useDispatch();
+
+    const inputRefs = useRef([]);
 
     const handleSubmit = async () => {
         try {
@@ -31,14 +31,9 @@ const Login = () => {
 
             const data = await response.json();
             console.warn('login data', data);
-            console.log('login data', data);
-            console.log('Response Status:', response.status);
-            console.log('Response OK:', response.ok);
 
             if (response.ok) {
-  
                 const { data: userData, token } = data;
-    
                 dispatch(setUser({ user: userData, token }));
                 console.warn('Login successful', userData);
 
@@ -106,6 +101,15 @@ const Login = () => {
         }
     };
 
+
+ // Focus the next input field
+ const focusNextInput = (index) => {
+    if (index < 5) {
+        inputRefs.current[index + 1].focus();
+    }
+};
+
+
     return (
         <View style={s.containerWhite}>
             <Image style={styles.bgImagelogin} source={require('../../Images/logo.png')} />
@@ -116,14 +120,25 @@ const Login = () => {
                 <Text style={styles.label}>
                     <Icon name="lock" size={20} color="#ee1d23" /> {' '} OTP :
                 </Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter your OTP"
-                    placeholderTextColor="#aaa"
-                    onChangeText={setOtp}
-                    value={otp}
-                    secureTextEntry
-                />
+
+                <View style={styles.otpContainer}>
+                    {[...Array(6)].map((_, i) => (
+                        <TextInput
+                            key={i}
+                            ref={(ref) => (inputRefs.current[i] = ref)}
+                            style={styles.otpInput}
+                            maxLength={1}
+                            keyboardType="numeric"
+                            onChangeText={(text) => {
+                                let otpText = otp.split('');
+                                otpText[i] = text;
+                                setOtp(otpText.join(''));
+                                if (text) focusNextInput(i);
+                            }}
+                            value={otp[i] || ''}
+                        />
+                    ))}
+                </View>
 
                 <TouchableOpacity onPress={handleResend}>
                     <Text style={styles.buttonText2}>Resend OTP</Text>
@@ -160,15 +175,23 @@ const styles = StyleSheet.create({
         color: 'black',
         fontWeight: '500'
     },
-    input: {
+    otpContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: responsiveHeight(2),
+    },
+    otpInput: {
         height: responsiveHeight(6),
+        width: responsiveWidth(12),
         borderColor: 'gray',
         borderWidth: 1,
         marginBottom: responsiveHeight(2),
         paddingLeft: responsiveHeight(3),
         borderRadius: 10,
         backgroundColor: '#fff',
-        color: "black"
+        color: "black",
+        textAlign: 'center',
+        fontSize: responsiveFontSize(2),
     },
     spaceBetween: {
         flexDirection: 'row',
@@ -195,7 +218,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
         color: 'red',
         fontSize: responsiveFontSize(1.8)
-
     }
 });
+
 export default Login;

@@ -9,11 +9,7 @@ const Dashboard = () => {
 
   const phoneNumber = useSelector(state => state.phone.phoneNumber);
   const navigation = useNavigation();
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSearch = () => {
-    navigation.navigate('SearchStatus');
-  };
+;
 
   return (
     <View style={styles.container}>
@@ -28,12 +24,6 @@ const Dashboard = () => {
           <TouchableOpacity style={styles.registerButton} onPress={() => { navigation.navigate('PhoneNoScreen'); }}>
             <Icon name="person-add-outline" size={20} color="#fff" style={styles.icon} />
             <Text style={styles.buttonText}>Register</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.searchContainer}>
-          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Icon name="search-outline" size={20} color="#fff" style={styles.icon} />
-            <Text style={styles.searchText}>Search here claim status</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -14,15 +14,26 @@ import OtpScreen from './Verification/OtpScreen';
 import ClaimHistory from './complain/claim/ClaimHistory';
 import Loginphone from './auth/Loginphone';
 import UpdateProfile from './profile/UpdateProfile';
+
 const Stack = createNativeStackNavigator();
+
+const linking = {
+  prefixes: ['mychat://'],
+  config: {
+    screens: {
+      SearchStatus: 'search-status',
+
+    },
+  },
+};
 
 const AppNavigator = () => {
 
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator initialRouteName="SplashScreen">
-  <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+        <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
         <Stack.Screen name="PhoneNoScreen" component={PhoneNoScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OtpScreen" component={OtpScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />

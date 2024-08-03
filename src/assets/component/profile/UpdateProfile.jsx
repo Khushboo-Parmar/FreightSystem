@@ -1,33 +1,56 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import Toast from 'react-native-toast-message';
 import DocumentPicker from 'react-native-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
+import { Dropdown } from 'react-native-element-dropdown';
+import { updateUser } from '../../../reduxFeatures/content/userReducer';
 
 const UpdateProfile = ({ navigation }) => {
-    const user = useSelector(state => state.user.user);
+    const user = useSelector(state => state.user.user) || {};
     const dispatch = useDispatch();
-    const [form, setForm] = useState({
-        name: user.full_name,
-        email: user.email,
-        phone: user.phone,
-        city: user.city,
-        address: user.address,
-    });
-    const [file, setFile] = useState(null);
+    const [name, setName] = useState(user.full_name || '');
+    const [email, setEmail] = useState(user.email || '');
+    const [address, setAddress] = useState(user.address || '');
+    const [phone, setPhone] = useState(user.phone || '');
+    const [city, setCity] = useState(user.city || '');
+    const [cityList, setCityList] = useState([]);
+    const [file, setFile] = useState(user.file || null);
+    const [file_id, setFileId] = useState('');
     const [fileUri, setFileUri] = useState(user.file);
-
-    const handleChange = (field, value) => {
-        setForm({ ...form, [field]: value });
+    const iconMapping = {
+        name: 'user',
+        email: 'envelope',
+        phone: 'phone',
+        city: 'map-marker',
+        address: 'address-book'
     };
 
-    const handleFileUpload = async () => {
+    useEffect(() => {
+        const fetchCityList = async () => {
+            try {
+                const response = await fetch(`${process.env.BASE_URL}city-name`);
+                const data = await response.json();
+                const cityNames = data.map(item => ({
+                    label: item.city_name,
+                    value: item.id,
+                }));
+                setCityList(cityNames);
+            } catch (error) {
+                console.error('Error fetching city list:', error.message);
+            }
+        };
+
+        fetchCityList();
+    }, []);
+
+    const handleShopDocumentUpload = async () => {
         try {
             const res = await DocumentPicker.pick({
-                type: [DocumentPicker.types.images],
+                type: [DocumentPicker.types.images, DocumentPicker.types.pdf],
                 allowMultiSelection: false,
             });
 
@@ -37,97 +60,112 @@ const UpdateProfile = ({ navigation }) => {
                 type: res[0].type,
             };
             setFile(selectedFile);
-            setFileUri(res[0].uri);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 console.log('User cancelled document picking');
             } else {
-                console.error('Error picking document:', err);
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error',
-                    text2: 'An error occurred while picking the document. Please try again..',
-                });
+                console.log('Error picking document:', err);
             }
         }
     };
 
-    const handleSubmit = async () => {
-        let profilePictureId = user.file;
+    const handleFileUpload = async () => {
+        console.log('Updating profile with file:', file);
 
-        if (file) {
-            const formData = new FormData();
-            formData.append('file', {
-                uri: file.uri,
-                name: file.name,
-                type: file.type,
-            });
+        if (!file) {
 
-            try {
-                const uploadResponse = await fetch(`${process.env.BASE_URL}file-Upload`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    body: formData,
-                });
-
-                const uploadData = await uploadResponse.json();
-
-                if (uploadResponse.status === 200) {
-                    profilePictureId = uploadData.data.file_id;
-                } else {
-                    Toast.show({
-                        type: 'Error',
-                        text1: 'File upload failed',
-                        text2: uploadData.message,
-                    });
-                    return;
-                }
-            } catch (error) {
-                console.error('Error uploading file:', error);
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error',
-                    text2: 'Failed to upload the file. Please check your network connection and try again.',
-                });
-             
-                return;
-            }
+            return '';
         }
 
+        const formData = new FormData();
+        formData.append('file', {
+            uri: file.uri,
+            name: file.name,
+            type: file.type,
+        });
+
         try {
-            const token = await AsyncStorage.getItem('token');
-            const response = await fetch(`${process.env.BASE_URL}update-profile`, {
+            const response = await fetch(`${process.env.BASE_URL}file-Upload`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
                 },
-                body: JSON.stringify({
-                    full_name: form.name,
-                    email: form.email,
-                    city: form.city,
-                    address: form.address,
-                    phone: form.phone,
-                    file_id: profilePictureId
-                }),
+                body: formData,
             });
 
             const data = await response.json();
 
+            if (data.status === 200) {
+                return data.data.file_id;
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'File upload failed',
+                    text2: data.message,
+                });
+                return '';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Failed to upload the file. Please check your network connection and try again',
+            });
+            return '';
+        }
+    };
+
+
+    const handleUpdate = async () => {
+        const uploadedFileId = await handleFileUpload();
+        // if (!uploadedFileId) return;
+        const finalFileId = uploadedFileId || file_id;
+
+        try {
+            const token = await AsyncStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('full_name', name);
+            formData.append('email', email);
+            formData.append('city', city);
+            formData.append('address', address);
+            formData.append('phone', phone);
+            formData.append('file_id', finalFileId);
+
+            const response = await fetch(`${process.env.BASE_URL}update-profile`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            const data = await response.json();
+            console.log('data ===', data)
+            console.warn('data ===', data)
             if (response.status === 200) {
-                dispatch({ type: 'updateUser', payload: { ...form, profilePictureId} });
                 Toast.show({
                     type: 'success',
                     text1: 'Profile updated successfully',
                 });
+                dispatch(updateUser({
+                    user: {
+                        ...user,
+                        full_name: name,
+                        email: email,
+                        city: city,
+                        address: address,
+                        phone: phone,
+                        file_id: finalFileId
+                        // file_id: uploadedFileId
+                    }
+                }));
                 navigation.goBack();
             } else {
                 Toast.show({
                     type: 'error',
                     text1: 'Failed to update profile',
-                    text2: data.message,
+                    text2: data.message || 'An unknown error occurred',
                 });
             }
         } catch (error) {
@@ -140,36 +178,89 @@ const UpdateProfile = ({ navigation }) => {
         }
     };
 
-    const iconMapping = {
-        name: 'user',
-        email: 'envelope',
-        phone: 'phone',
-        city: 'map-marker',
-        address: 'address-book'
-    };
-
     return (
         <View style={styles.container}>
+            <View style={{ display: 'flex', flexDirection: "row", alignItems: "center", justifyContent: 'flex-start', gap: responsiveWidth(25) }}>
+
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.title}>Edit Profile</Text>
+
+            </View>
             <View style={styles.profileSection}>
-                <Image source={{ uri: fileUri }} style={styles.profileImage} />
-                <TouchableOpacity style={styles.uploadButton} onPress={handleFileUpload}>
+                <Image
+                    source={{ uri: file.uri ? file.uri : user?.file }}
+                    style={styles.profileImage}
+                />
+                <TouchableOpacity style={styles.uploadButton} onPress={handleShopDocumentUpload}>
                     <FontAwesome name="pencil" size={responsiveFontSize(3)} color="white" />
                 </TouchableOpacity>
             </View>
-
-            {Object.keys(form).map((key) => (
-                <View key={key} style={styles.inputContainer}>
-                    <FontAwesome name={iconMapping[key]} size={responsiveFontSize(2.5)} style={styles.icon} />
+            <ScrollView>
+                <View style={styles.inputContainer}>
+                    <FontAwesome name={iconMapping.name} size={responsiveFontSize(2.5)} style={styles.icon} />
                     <TextInput
-                        value={form[key]}
-                        onChangeText={(value) => handleChange(key, value)}
-                        placeholder={`Enter ${key}`}
+                        value={name}
+                        onChangeText={setName}
+                        placeholder="Name"
                         placeholderTextColor='black'
                         style={styles.input}
                     />
                 </View>
-            ))}
-            <TouchableOpacity style={styles.btn} onPress={handleSubmit}>
+
+                <View style={styles.inputContainer}>
+                    <FontAwesome name={iconMapping.email} size={responsiveFontSize(2.5)} style={styles.icon} />
+                    <TextInput
+                        value={email}
+                        onChangeText={setEmail}
+                        placeholder="Email"
+                        placeholderTextColor='black'
+                        style={styles.input}
+                    />
+                </View>
+
+                <View style={styles.inputContainer}>
+                    <FontAwesome name={iconMapping.phone} size={responsiveFontSize(2.5)} style={styles.icon} />
+                    <TextInput
+                        value={phone}
+                        onChangeText={setPhone}
+                        placeholder="Phone"
+                        placeholderTextColor='black'
+                        style={styles.input}
+                        editable={false}
+                    />
+                </View>
+
+                <View style={styles.inputContainer}>
+                    <FontAwesome name={iconMapping.address} size={responsiveFontSize(2.5)} style={styles.icon} />
+                    <TextInput
+                        value={address}
+                        onChangeText={setAddress}
+                        placeholder="Address"
+                        placeholderTextColor='black'
+                        style={styles.input}
+                    />
+                </View>
+
+                <View style={styles.inputContainer}>
+                    <FontAwesome name={iconMapping.city} size={responsiveFontSize(2.5)} style={styles.icon} />
+                    <Dropdown
+                        style={[styles.input, styles.dropdownstyle]}
+                        data={cityList}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={city || "Select City"}
+                        itemTextStyle={styles.itemTextStyle}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        value={city}
+                        onChange={item => setCity(item.value)}
+                    />
+                </View>
+            </ScrollView>
+
+            <TouchableOpacity style={styles.btn} onPress={handleUpdate}>
                 <Text style={styles.btnText}>Save Changes</Text>
             </TouchableOpacity>
         </View>
@@ -186,6 +277,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: responsiveHeight(3),
         position: 'relative',
+        marginTop:responsiveHeight(2)
     },
     profileImage: {
         width: responsiveWidth(30),
@@ -228,7 +320,8 @@ const styles = StyleSheet.create({
         borderColor: 'grey',
         borderWidth: 1,
         borderRadius: responsiveWidth(2),
-        padding: responsiveWidth(3),
+        paddingLeft: responsiveWidth(1.5),
+        width: responsiveWidth(89),
         backgroundColor: 'white',
         shadowColor: "#000",
         shadowOffset: {
@@ -238,7 +331,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 3,
         elevation: 3,
-
     },
     icon: {
         marginRight: responsiveWidth(2),
@@ -267,6 +359,34 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: responsiveFontSize(2.2),
         fontWeight: 'bold',
+    },
+    placeholderStyle: {
+        color: 'black'
+    },
+    selectedTextStyle: {
+        color: 'black',
+    },
+    itemTextStyle: {
+        color: 'black'
+    },
+    dropdownstyle: {
+        padding: responsiveWidth(3)
+    },
+    backButton: {
+        marginLeft: responsiveWidth(1),
+        width: responsiveWidth(10),
+        backgroundColor: '#3c3c3c',
+        height: responsiveHeight(5),
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    title: {
+        fontSize: responsiveFontSize(2),
+        fontWeight: 'bold',
+        textAlign: 'center',
+        // marginBottom: responsiveHeight(2),
+        color: 'black',
     },
 });
 

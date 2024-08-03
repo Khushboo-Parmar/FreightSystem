@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-    View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet
-} from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import DocumentPicker from 'react-native-document-picker';
@@ -12,10 +10,12 @@ import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 const ClaimForm = () => {
+
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
     const user = useSelector((state) => state.user.user);
     const userId = user.id;
     const navigation = useNavigation();
+
     const [claimDetails, setClaimDetails] = useState('');
     const [selectedDate, setSelectedDate] = useState(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -27,6 +27,9 @@ const ClaimForm = () => {
     const [invoiceFiles, setInvoiceFiles] = useState([]);
     const [transportFiles, setTransportFiles] = useState([]);
     const [distributorList, setDistributorList] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState('');
+    const [productList, setProductList] = useState([]);
+    const [productPrice, setProductPrice] = useState(0);
 
     const showDatePicker = () => setDatePickerVisibility(true);
     const hideDatePicker = () => setDatePickerVisibility(false);
@@ -37,7 +40,6 @@ const ClaimForm = () => {
     const today = new Date();
     const handleFileUpload = async (file) => {
         if (!file) {
-            // Alert.alert('Error', 'Please select a file first');
             Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -69,7 +71,6 @@ const ClaimForm = () => {
                 return data.file_id;
             } else {
                 console.error('File upload error:', data.message);
-                // Alert.alert('Error', data.message || 'File upload failed');
                 Toast.show({
                     type: 'Error',
                     text1: 'File upload failed',
@@ -79,7 +80,6 @@ const ClaimForm = () => {
             }
         } catch (error) {
             console.error('Error uploading file:', error);
-            // Alert.alert('Failed to upload the file. Please check your network connection and try again.');
             Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -88,8 +88,6 @@ const ClaimForm = () => {
             return null;
         }
     };
-
-
     const handleFileSelection = async (type) => {
         try {
             const res = await DocumentPicker.pick({
@@ -123,14 +121,13 @@ const ClaimForm = () => {
 
     const handleSubmitClaim = async () => {
         console.log('Submitting claim...');
-        if (invoiceFiles.length === 0) {
-            // Alert.alert('Error', 'Invoice images are required');
+        if (invoiceFiles.length === 0) { 
             Toast.show({
                 type: 'error',
                 text1: 'Error',
                 text2: 'Invoice images are required.',
             });
-        
+
             return;
         }
         if (!selectedDate) {
@@ -151,18 +148,65 @@ const ClaimForm = () => {
             console.log('Distributor is missing');
             return;
         }
+        if (!selectedProduct) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Product is required.',
+            });
+            return;
+        }
+        if (!invoiceNo) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Invoice number is required.',
+            });
+            return;
+        }
+        if (!totalBoxes) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Total number of boxes is required.',
+            });
+            return;
+        }
+        if (!totalAmount) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Total amount is required.',
+            });
+            return;
+        }
+        if (!freightAmount) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Freight amount is required.',
+            });
+            return;
+        }
+        if (!claimDetails) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Claim details are required.',
+            });
+            return;
+        }
 
         const fifteenDaysAgo = new Date();
         fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
 
         if (selectedDate < fifteenDaysAgo) {
-            // Alert.alert('Error', 'Sorry, you cannot submit the claim form for purchases made more than 15 days ago.');
             Toast.show({
                 type: 'error',
                 text1: 'Error',
                 text2: 'Sorry, you cannot submit the claim form for purchases made more than 15 days ago.',
             });
-            
+
             return;
         }
 
@@ -183,6 +227,11 @@ const ClaimForm = () => {
         formData.append('freight_amount', freightAmount);
         formData.append('claim_details', claimDetails);
         formData.append('generated_by', userId);
+        formData.append('product_id', selectedProduct);
+
+
+        console.log('selectedProduct', selectedProduct)
+
         uploadedInvoiceFileIds.forEach((fileId, index) => {
             formData.append(`invoice_image`, fileId);
         });
@@ -199,7 +248,7 @@ const ClaimForm = () => {
             }
             console.log('Token:', token);
 
-            const response = await fetch(`${process.env.BASE_URL}user-claim`, {
+            const response = await fetch(`${process.env.BASE_URL}add-claim`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -222,12 +271,11 @@ const ClaimForm = () => {
                 setFreightAmount('');
                 setInvoiceFiles([]);
                 setTransportFiles([]);
-
-
+                setSelectedProduct('')
                 console.log('Claim submitted successfully:', data);
                 navigation.navigate('ClaimHistory');
             } else {
-                // Alert.alert('Error', data.message || 'Claim submission failed');
+
                 Toast.show({
                     type: 'Error',
                     text1: 'Claim submission failed',
@@ -241,7 +289,7 @@ const ClaimForm = () => {
                 text1: 'Error',
                 text2: 'Failed to submit the claim. Please check your network connection and try again.',
             });
-            // Alert.alert('Failed to submit the claim. Please check your network connection and try again.');
+
         }
     };
 
@@ -268,6 +316,56 @@ const ClaimForm = () => {
             setTransportFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
         }
     };
+    // product list 
+
+    useEffect(() => {
+        const fetchProductList = async () => {
+            try {
+                const response = await fetch(`${process.env.BASE_URL}productItem-list`);
+                const data = await response.json();
+                const products = data.map(item => ({
+                    label: item.product_name,
+                    value: item.id,
+                    price: item.price
+                }));
+                console.warn('products', products)
+                setProductList(products);
+            } catch (error) {
+                console.error('Error fetching product list:', error.message);
+            }
+        };
+        fetchProductList();
+    }, []);
+
+    // product price
+
+    useEffect(() => {
+        const fetchProductPrice = async () => {
+            try {
+                const product = productList.find(p => p.value === selectedProduct);
+                if (product) {
+                    setProductPrice(product.price);
+                } else {
+                    setProductPrice(0);
+                }
+            } catch (error) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: 'Failed to fetch product price.',
+                });
+            }
+        };
+
+        fetchProductPrice();
+    }, [selectedProduct]);
+
+
+    useEffect(() => {
+        const calculatedAmount = productPrice * (parseInt(totalBoxes) || 0);
+        setTotalAmount(calculatedAmount.toFixed(2));
+    }, [productPrice, totalBoxes]);
+
 
     return (
         <View style={styles.container}>
@@ -304,6 +402,26 @@ const ClaimForm = () => {
                         }}
                     />
                 </View>
+                {/* product list start */}
+                <View style={styles.inputContainer}>
+                    <Icon name="cubes" size={20} color="#ee1d23" style={styles.icon} />
+                    <Dropdown
+                        style={styles.input}
+                        data={productList}
+                        labelField="label"
+                        valueField="value"
+                        placeholder="Select a product"
+                        itemTextStyle={styles.itemTextStyle}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        value={selectedProduct}
+                        onChange={item => {
+                            setSelectedProduct(item.value);
+                        }}
+                    />
+                </View>
+
+                {/* product list end */}
 
                 <View style={styles.inputContainer}>
                     <Icon name="file-text" size={20} color="#ee1d23" style={styles.icon} />
@@ -335,7 +453,8 @@ const ClaimForm = () => {
                         placeholderTextColor="grey"
                         keyboardType="numeric"
                         value={totalAmount}
-                        onChangeText={setTotalAmount}
+                        // onChangeText={setTotalAmount}
+                        editable={false}
                     />
                 </View>
 
@@ -372,20 +491,28 @@ const ClaimForm = () => {
                     <ScrollView horizontal style={styles.filePreviewContainer}>
                         <View key={index} style={styles.filePreview}>
                             {file.type === 'application/pdf' ? (
-                                <Text style={styles.fileText}>PDF: {file.name}</Text>
-                            ) : (
-                                <Image
-                                    source={{ uri: file.uri }}
-                                    style={styles.uploadedImage}
-                                />
+                                <View style={styles.pdfContainer}>
+                                    <Icon name="file-pdf-o" size={50} color="red" />
+                                    <Text style={styles.fileText}>PDF: {file.name}</Text>
+                                    <TouchableOpacity style={styles.removeButtonpdf} onPress={() => removeFile('invoice', index)}>
+                                        <Icon name="times-circle" size={15} color="red" />
+                                    </TouchableOpacity>
+                                </View>
+                            ) : ( 
+                                <>
+                                    <Image
+                                        source={{ uri: file.uri }}
+                                        style={styles.uploadedImage}
+                                    />
+                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('invoice', index)}>
+                                        <Icon name="times-circle" size={15} color="red" />
+                                    </TouchableOpacity>
+                                </>
                             )}
-                            <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('invoice', index)}>
-                                <Icon name="times-circle" size={15} color="red" />
-                            </TouchableOpacity>
+
                         </View>
                     </ScrollView>
                 ))}
-
 
                 <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('transport')}>
                     <Text style={styles.fileButtonText}>Upload Transport Receipt Images</Text>
@@ -395,16 +522,24 @@ const ClaimForm = () => {
                     <ScrollView horizontal style={styles.filePreviewContainer}>
                         <View key={index} style={styles.filePreview}>
                             {file.type === 'application/pdf' ? (
-                                <Text style={styles.fileText}>PDF: {file.name}</Text>
+                                <View style={styles.pdfContainer}>
+                                    <Icon name="file-pdf-o" size={50} color="red" />
+                                    <Text style={styles.fileText}>PDF: {file.name}</Text>
+                                    <TouchableOpacity style={styles.removeButtonpdf} onPress={() => removeFile('transport', index)}>
+                                        <Icon name="times-circle" size={15} color="red" />
+                                    </TouchableOpacity>
+                                </View>
                             ) : (
-                                <Image
-                                    source={{ uri: file.uri }}
-                                    style={styles.uploadedImage}
-                                />
+                                <>
+                                    <Image
+                                        source={{ uri: file.uri }}
+                                        style={styles.uploadedImage}
+                                    />
+                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('transport', index)}>
+                                        <Icon name="times-circle" size={15} color="red" />
+                                    </TouchableOpacity>
+                                </>
                             )}
-                            <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('transport', index)}>
-                                <Icon name="times-circle" size={15} color="red" />
-                            </TouchableOpacity>
                         </View>
                     </ScrollView>
                 ))}
@@ -477,10 +612,8 @@ const styles = StyleSheet.create({
     },
     filePreview: {
         marginTop: 10,
-        width: responsiveWidth(20),
-        height: responsiveHeight(10),
         marginRight: 10,
-        position: 'relative',
+        alignItems: 'center',
     },
     submitButton: {
         backgroundColor: '#ee1d23',
@@ -502,8 +635,9 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     uploadedImage: {
-        width: '100%',
-        height: '100%',
+        width: responsiveWidth(20),
+        height: responsiveHeight(10),
+        position: 'relative',
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,
@@ -531,6 +665,24 @@ const styles = StyleSheet.create({
     filePreviewContainer: {
         flexDirection: 'row',
     },
+    fileText: {
+        marginLeft: responsiveWidth(2),
+        fontSize: responsiveFontSize(1.8),
+        color: 'black',
+    },
+    pdfContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        gap: responsiveWidth(2),
+    },
+    removeButtonpdf: {
+        backgroundColor: 'rgba(255,255,255,0.7)',
+        borderRadius: 10,
+        width: 20,
+        height: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
-
 export default ClaimForm;

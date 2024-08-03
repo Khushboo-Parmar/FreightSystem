@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 const MyPieChart = () => {
     const [data, setData] = useState([
         {
@@ -36,7 +35,6 @@ const MyPieChart = () => {
                 if (!token) {
                     throw new Error("Token not found");
                 }
-
                 const response = await fetch(`${process.env.BASE_URL}count-status`, {
                     method: 'GET',
                     headers: {
@@ -44,9 +42,7 @@ const MyPieChart = () => {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-
                 const result = await response.json();
-        
                 if (response.ok) {
                     const newData = [
                         {

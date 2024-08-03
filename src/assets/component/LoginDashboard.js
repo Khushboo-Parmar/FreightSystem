@@ -12,7 +12,6 @@ import MyPieChart from './MyPieChart';
 const LoginDashboard = () => {
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
     const user = useSelector(state => state.user.user);
-    console.warn('user=', user)
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
@@ -27,7 +26,7 @@ const LoginDashboard = () => {
 
     useEffect(() => {
         if (!user) {
-            navigation.navigate('Login');
+            navigation.navigate('LoginPhone');
         }
     }, [user, navigation]);
 
@@ -38,7 +37,6 @@ const LoginDashboard = () => {
                 if (!token) {
                     throw new Error("Token not found");
                 }
-
                 const response = await fetch(`${process.env.BASE_URL}count-status`, {
                     method: 'GET',
                     headers: {
@@ -47,8 +45,8 @@ const LoginDashboard = () => {
                     },
                 });
 
-                const result = await response.json();
-                console.log()
+                const textResponse = await response.text();
+                const result = JSON.parse(textResponse);
                 if (response.ok) {
                     setTotalClaimCount(result.status_counts.total_status_count);
                     setTotalFreightAmount(result.status_counts.total_freight_amount);
@@ -94,14 +92,22 @@ const LoginDashboard = () => {
 
     return (
         <View style={styles.container}>
-            <Image style={styles.bgImage} source={require('../Images/logo.png')} />
             {user && (
                 <View style={styles.content}>
                     <View style={styles.header}>
-                        <Text style={styles.greeting}>Hi, {user.full_name}</Text>
-                        <TouchableOpacity onPress={toggleModal}>
-                            <Image style={styles.profilepic} source={require('../Images/profile.png')} />
-                        </TouchableOpacity>
+                        <View>
+                            {/* <Image style={styles.bgImage} source={require('../Images/logo.png')} /> */}
+                            <Text style={{ color: 'white', fontSize:responsiveFontSize(2.5),fontWeight:'600' }}>Bytegear</Text>
+                            <Text style={{ color: 'white', fontSize: responsiveFontSize(1.5),fontWeight:'500', marginLeft:responsiveWidth(8) }}>Freight App</Text>
+                            {/* <Image style={{}} source={require('../Images/smalll2.png')} /> */}
+                        </View>
+                        <View style={styles.header2}>
+                            <Ionicons name="person-circle-outline" size={25} color="white" />
+                            <Text style={styles.greeting}>Hi, {user.full_name}</Text>
+                            <TouchableOpacity onPress={toggleModal}>
+                                <Ionicons name="chevron-down-sharp" size={22} color="white" />
+                            </TouchableOpacity>
+                        </View>
                         <Modal
                             transparent={true}
                             animationType="fade"
@@ -127,7 +133,10 @@ const LoginDashboard = () => {
                             </View>
                         </Modal>
                     </View>
-                    <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+                    <View contentContainerStyle={styles.scrollViewContainer}
+                       
+
+                    >
                         <View style={styles.scrollViewContent}>
                             <MyPieChart />
                             <View style={styles.card}>
@@ -162,7 +171,7 @@ const LoginDashboard = () => {
                                 </View>
                             </View>
                         </View>
-                    </ScrollView>
+                    </View>
                 </View>
             )}
         </View>
@@ -174,29 +183,31 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
-        // backgroundColor: '#f5f5f5',
     },
     bgImage: {
-        height: responsiveHeight(28),
-        width: responsiveWidth(100),
+        height: responsiveHeight(8),
+        width: responsiveWidth(10),
+        resizeMode: 'stretch'
     },
-    content: {
-        flex: 1,
-        padding: responsiveWidth(5),
-    },
+    // content: {
+    //     flex: 1,
+    //     padding: responsiveWidth(5),
+    // },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        backgroundColor: '#ee1d23',
+        padding:responsiveHeight(2)
     },
     greeting: {
-        fontSize: responsiveFontSize(2.5),
+        fontSize: responsiveFontSize(1.8),
         fontWeight: 'bold',
         color: 'black'
     },
     profilepic: {
-        width: responsiveWidth(10),
-        height: responsiveWidth(10),
+        width: responsiveWidth(5),
+        height: responsiveHeight(5),
     },
     modalOverlay: {
         flex: 1,
@@ -204,7 +215,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         position: 'absolute',
-        top: '30%',
+        top: '9%',
         right: '5%',
         backgroundColor: 'white',
         padding: 20,
@@ -222,6 +233,7 @@ const styles = StyleSheet.create({
     scrollViewContent: {
         flexGrow: 1,
         paddingBottom: responsiveHeight(4),
+        padding: responsiveWidth(5),
     },
     card: {
         backgroundColor: 'white',
@@ -276,4 +288,11 @@ const styles = StyleSheet.create({
         color: 'white',
         marginLeft: 5,
     },
+    header2: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap:responsiveWidth(2)
+
+    }
 });

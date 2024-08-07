@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useCallback } from "react";
+import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { useSelector } from 'react-redux';
 import { useNavigation } from "@react-navigation/native";
@@ -17,7 +17,7 @@ const ClaimHistory = () => {
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const [refreshing, setRefreshing] = useState(false);
     useEffect(() => {
         const fetchComplaints = async () => {
             setLoading(true);
@@ -68,10 +68,23 @@ const ClaimHistory = () => {
             labelStyle={{ color: 'black', fontSize: responsiveFontSize(1.2), fontWeight: '500' }}
         />
     );
+    
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+    
+    }, []);
+
     const renderComplaints = (status) => {
         const filteredComplaints = complaints.filter(complaint => complaint.status === status);
         return (
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+            }
+            >
                 {filteredComplaints.length === 0 ? (
                     <View style={styles.noDataContainer}>
                         <Image
@@ -111,36 +124,6 @@ const ClaimHistory = () => {
             </ScrollView>
         );
     };
-
-    // const renderComplaints = (status) => (
-    //     <ScrollView contentContainerStyle={styles.scrollContainer}>
-
-    //         {complaints.filter(complaint => complaint.status === status).map(complaint => (
-    //             <TouchableOpacity
-    //                 key={complaint.search_id}
-    //                 style={styles.card}
-    //             >
-    //                 <View style={styles.cardContent}>
-    //                     <Image
-    //                         style={styles.productImage}
-    //                         source={{ uri: complaint.invoice_image_url }}
-    //                     />
-    //                     <View style={styles.textContainer}>
-    //                         <Text style={styles.text}>Purchase Date: {complaint.purchase_date}</Text>
-    //                         <Text style={styles.text}>Distributor Name: {complaint.distributor_name}</Text>
-    //                         <Text style={styles.text}>Product Name: {complaint.product_name}</Text>
-    //                         <Text style={styles.text}>Invoice No: {complaint.invoice_no}</Text>
-    //                         <Text style={styles.text}>Total Amount: {complaint.total_amount}</Text>
-    //                         <Text style={styles.text}>Freight Amount: {complaint.freight_amount}</Text>
-    //                         <Text style={styles.text}>Search ID: {complaint.search_id}</Text>
-    //                         {/* <Text style={styles.text}>why cancel: {complaint.cancled}</Text> */}
-    //                         <Text style={styles.text}>Status: {getStatusText(complaint.status)}</Text>
-    //                     </View>
-    //                 </View>
-    //             </TouchableOpacity>
-    //         ))}
-    //     </ScrollView>
-    // );
 
     const FirstRoute = () => renderComplaints('0');
     const FourthRoute = () => renderComplaints('1');
@@ -305,8 +288,8 @@ const styles = StyleSheet.create({
         padding: responsiveWidth(4),
     },
     noDataImage: {
-        width: responsiveWidth(50),
-        height: responsiveWidth(50),
+        width: responsiveWidth(60),
+        height: responsiveWidth(60),
         resizeMode: 'contain',
     },
     noDataText: {

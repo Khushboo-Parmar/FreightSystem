@@ -14,6 +14,11 @@ import OtpScreen from './Verification/OtpScreen';
 import ClaimHistory from './complain/claim/ClaimHistory';
 import Loginphone from './auth/Loginphone';
 import UpdateProfile from './profile/UpdateProfile';
+import AddProduct from './complain/claim/AddProduct';
+import GeneralTerms from './policies/GeneralTerms';
+import PrivacyPolicy from './policies/PrivacyPolicy';
+import DisclaimerPolicy from './policies/DisclaimerPolicy';
+import CameraTaking from './complain/claim/CameraTaking';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +35,7 @@ const linking = {
 const AppNavigator = () => {
 
   return (
-    <NavigationContainer linking={linking}>
+    // <NavigationContainer linking={linking}>
       <Stack.Navigator initialRouteName="SplashScreen">
         <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
@@ -45,8 +50,13 @@ const AppNavigator = () => {
         <Stack.Screen name="LoginDashboard" component={LoginDashboard} options={{ headerShown: false }} />
         <Stack.Screen name="Loginphone" component={Loginphone} options={{ headerShown: false }} />
         <Stack.Screen name="UpdateProfile" component={UpdateProfile} options={{ headerShown: false }} />
+        <Stack.Screen name="AddProduct" component={AddProduct} options={{ headerShown: false }} />
+        <Stack.Screen name="GeneralTerms" component={GeneralTerms} options={{ headerShown: false }} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{ headerShown: false }} />
+        <Stack.Screen name="DisclaimerPolicy" component={DisclaimerPolicy} options={{ headerShown: false }} />
+        <Stack.Screen name="CameraTaking" component={CameraTaking} options={{ headerShown: false }} />
       </Stack.Navigator>
-    </NavigationContainer>
+//  </NavigationContainer>
   );
 }
 

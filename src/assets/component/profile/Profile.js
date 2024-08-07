@@ -12,21 +12,21 @@ const Profile = () => {
     const handleEdit = async () => {
         navigation.navigate('UpdateProfile');
     }
-console.log('p user', user)
+    console.log('p user', user)
     return (
         <View style={styles.container}>
-                  
+
             {user && (
                 <>
                     <View style={styles.curve}>
                         <Image
-                        style={styles.profilepic}
-                        source={{ uri: user?.file }} 
-                    />
+                            style={styles.profilepic}
+                            source={{ uri: user?.file }}
+                        />
                     </View>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-    <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
-</TouchableOpacity>
+                        <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
+                    </TouchableOpacity>
                     <View style={styles.infoContainer}>
                         <View style={styles.infoBox}>
                             <View style={styles.infoIcon}>
@@ -64,14 +64,14 @@ console.log('p user', user)
                             </View>
                         </View>
 
-                    
-                    </View>
 
+                    </View>
+                    {/* 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.btn} onPress={handleEdit}>
                             <Text style={styles.btnText}>Edit Profile</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
 
                 </>
             )}
@@ -196,9 +196,9 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
-        position:'absolute',
-        Top:responsiveHeight(2),
-        left:responsiveWidth(1),
+        position: 'absolute',
+        Top: responsiveHeight(2),
+        left: responsiveWidth(1),
     },
     title: {
         fontSize: responsiveFontSize(2),
@@ -207,5 +207,5 @@ const styles = StyleSheet.create({
         // marginBottom: responsiveHeight(2),
         color: 'black',
     },
-    
+
 });

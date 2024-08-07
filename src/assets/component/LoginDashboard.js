@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback, Modal, ScrollView } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback, Modal, ScrollView, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
@@ -14,11 +14,11 @@ const LoginDashboard = () => {
     const user = useSelector(state => state.user.user);
     const navigation = useNavigation();
     const dispatch = useDispatch();
-
     const [modalVisible, setModalVisible] = useState(false);
     const [totalClaimCount, setTotalClaimCount] = useState(null);
     const [totalAmount, setTotalAmount] = useState(null);
     const [totalFreightAmount, setTotalFreightAmount] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -30,7 +30,7 @@ const LoginDashboard = () => {
         }
     }, [user, navigation]);
 
-    useEffect(() => {
+    // useEffect(() => {
         const fetchDashboardData = async () => {
             try {
                 const token = await AsyncStorage.getItem('token');
@@ -67,10 +67,16 @@ const LoginDashboard = () => {
                     text2: 'An error occurred while fetching dashboard data.',
                 });
             }
+            finally {
+                setRefreshing(false);
+            }
         };
+    //     fetchDashboardData();
+    // }, []);
+    useEffect(() => {
         fetchDashboardData();
     }, []);
-
+    
     const handleLogout = async () => {
         try {
             dispatch(clearUser());
@@ -90,22 +96,29 @@ const LoginDashboard = () => {
         }
     };
 
+
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        fetchDashboardData();
+    }, []);
+
+
     return (
         <View style={styles.container}>
             {user && (
                 <View style={styles.content}>
                     <View style={styles.header}>
                         <View>
-                            {/* <Image style={styles.bgImage} source={require('../Images/logo.png')} /> */}
-                            <Text style={{ color: 'white', fontSize:responsiveFontSize(2.5),fontWeight:'600' }}>Bytegear</Text>
-                            <Text style={{ color: 'white', fontSize: responsiveFontSize(1.5),fontWeight:'500', marginLeft:responsiveWidth(8) }}>Freight App</Text>
+                            <Text style={{ color: 'white', fontSize: responsiveFontSize(2.5), fontWeight: '600' }}>Bytegear</Text>
+                            <Text style={{ color: 'white', fontSize: responsiveFontSize(1.5), fontWeight: '500', marginLeft: responsiveWidth(8) }}>Freight App</Text>
                             {/* <Image style={{}} source={require('../Images/smalll2.png')} /> */}
                         </View>
                         <View style={styles.header2}>
                             <Ionicons name="person-circle-outline" size={25} color="white" />
                             <Text style={styles.greeting}>Hi, {user.full_name}</Text>
-                            <TouchableOpacity onPress={toggleModal}>
-                                <Ionicons name="chevron-down-sharp" size={22} color="white" />
+                            <TouchableOpacity onPress={()=>{navigation.openDrawer()}}>
+                                <Ionicons name="menu-outline" size={25} color="white" />
                             </TouchableOpacity>
                         </View>
                         <Modal
@@ -133,8 +146,13 @@ const LoginDashboard = () => {
                             </View>
                         </Modal>
                     </View>
-                    <View contentContainerStyle={styles.scrollViewContainer}
-                       
+                    <ScrollView contentContainerStyle={styles.scrollViewContainer}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
+                        }
 
                     >
                         <View style={styles.scrollViewContent}>
@@ -160,7 +178,7 @@ const LoginDashboard = () => {
                             <View style={styles.card}>
                                 <Text style={styles.welcomeText}>We are pleased to help you</Text>
                                 <View style={styles.buttonView}>
-                                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ClaimForm')}>
+                                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AddProduct')}>
                                         <Ionicons name="add-circle-outline" size={24} color="white" />
                                         <Text style={styles.buttonText}>Add Claim</Text>
                                     </TouchableOpacity>
@@ -171,7 +189,7 @@ const LoginDashboard = () => {
                                 </View>
                             </View>
                         </View>
-                    </View>
+                    </ScrollView>
                 </View>
             )}
         </View>
@@ -198,7 +216,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#ee1d23',
-        padding:responsiveHeight(2)
+        padding: responsiveHeight(2)
     },
     greeting: {
         fontSize: responsiveFontSize(1.8),
@@ -292,7 +310,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        gap:responsiveWidth(2)
+        gap: responsiveWidth(2)
 
     }
 });

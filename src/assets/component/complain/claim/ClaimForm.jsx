@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet ,RefreshControl} from 'react-native';
 import { useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useRoute } from '@react-navigation/native';
 import DocumentPicker from 'react-native-document-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,28 +9,32 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
-const ClaimForm = () => {
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker'; 
 
+const ClaimForm = () => {
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
     const user = useSelector((state) => state.user.user);
     const userId = user.id;
     const navigation = useNavigation();
 
+    const route = useRoute();
+    const [totalBoxes, setTotalBoxes] = useState(route.params?.totalBoxes || '');
+    const [totalAmount, setTotalAmount] = useState(route.params?.totalAmount || '');
+    const [selectedProduct, setSelectedProduct] = useState(route.params?.selectedProduct || '');
     const [claimDetails, setClaimDetails] = useState('');
     const [selectedDate, setSelectedDate] = useState(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedDistributor, setSelectedDistributor] = useState('');
     const [invoiceNo, setInvoiceNo] = useState('');
-    const [totalBoxes, setTotalBoxes] = useState('');
-    const [totalAmount, setTotalAmount] = useState('');
+
     const [freightAmount, setFreightAmount] = useState('');
     const [invoiceFiles, setInvoiceFiles] = useState([]);
     const [transportFiles, setTransportFiles] = useState([]);
     const [distributorList, setDistributorList] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState('');
+
     const [productList, setProductList] = useState([]);
     const [productPrice, setProductPrice] = useState(0);
-
+    const [refreshing, setRefreshing] = React.useState(false);
     const showDatePicker = () => setDatePickerVisibility(true);
     const hideDatePicker = () => setDatePickerVisibility(false);
     const handleConfirmDate = (date) => {
@@ -88,40 +92,51 @@ const ClaimForm = () => {
             return null;
         }
     };
+
     const handleFileSelection = async (type) => {
         try {
-            const res = await DocumentPicker.pick({
-                type: [DocumentPicker.types.images, DocumentPicker.types.pdf],
-                allowMultiSelection: true,
+            const options = {
+                mediaType: 'photo',
+                includeBase64: false,
+            };
+            const result = await new Promise((resolve, reject) => {
+                Alert.alert(
+                    'Select Image',
+                    'Choose an option',
+                    [
+                        { text: 'Camera', onPress: () => launchCamera(options, (response) => resolve(response)) },
+                        { text: 'Gallery', onPress: () => launchImageLibrary(options, (response) => resolve(response)) },
+                        { text: 'Cancel', onPress: () => reject('User cancelled'), style: 'cancel' }
+                    ],
+                    { cancelable: false }
+                );
             });
 
-            console.log('Selected files:', res);
+            if (result.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (result.errorCode) {
+                console.error('ImagePicker Error: ', result.errorMessage);
+            } else {
+                const selectedFile = {
+                    uri: result.assets[0].uri,
+                    name: result.assets[0].fileName,
+                    type: result.assets[0].type,
+                };
 
-            const selectedFiles = res.map(file => ({
-                uri: file.uri,
-                name: file.name,
-                type: file.type,
-            }));
-
-            if (type === 'invoice') {
-                setInvoiceFiles(prevFiles => [...prevFiles, ...selectedFiles]);
-            } else if (type === 'transport') {
-                setTransportFiles(prevFiles => [...prevFiles, ...selectedFiles]);
+                if (type === 'invoice') {
+                    setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
+                } else if (type === 'transport') {
+                    setTransportFiles(prevFiles => [...prevFiles, selectedFile]);
+                }
             }
         } catch (err) {
-            if (DocumentPicker.isCancel(err)) {
-                console.log('User cancelled file picking');
-            } else {
-                console.error('Error picking file:', err);
-            }
+            console.error('Error picking file:', err);
         }
     };
-
-    ;
-
+    
     const handleSubmitClaim = async () => {
         console.log('Submitting claim...');
-        if (invoiceFiles.length === 0) { 
+        if (invoiceFiles.length === 0) {
             Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -148,30 +163,7 @@ const ClaimForm = () => {
             console.log('Distributor is missing');
             return;
         }
-        if (!selectedProduct) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Product is required.',
-            });
-            return;
-        }
-        if (!invoiceNo) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Invoice number is required.',
-            });
-            return;
-        }
-        if (!totalBoxes) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Total number of boxes is required.',
-            });
-            return;
-        }
+        
         if (!totalAmount) {
             Toast.show({
                 type: 'error',
@@ -228,7 +220,6 @@ const ClaimForm = () => {
         formData.append('claim_details', claimDetails);
         formData.append('generated_by', userId);
         formData.append('product_id', selectedProduct);
-
 
         console.log('selectedProduct', selectedProduct)
 
@@ -292,7 +283,6 @@ const ClaimForm = () => {
 
         }
     };
-
     useEffect(() => {
         const fetchDistributorList = async () => {
             try {
@@ -316,8 +306,6 @@ const ClaimForm = () => {
             setTransportFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
         }
     };
-    // product list 
-
     useEffect(() => {
         const fetchProductList = async () => {
             try {
@@ -366,11 +354,25 @@ const ClaimForm = () => {
         setTotalAmount(calculatedAmount.toFixed(2));
     }, [productPrice, totalBoxes]);
 
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        setTimeout(() => {
+          setRefreshing(false);
+        }, 2000);
+      }, []);
 
+
+    const handleAddProductDetils =()=>{
+        navigation.navigate('AddProduct')
+    }
     return (
         <View style={styles.container}>
             <Text style={styles.heading}>Freight Claim Form</Text>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}
+             refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            >
                 <TouchableOpacity style={styles.inputContainer} onPress={showDatePicker}>
                     <Icon name="calendar" size={20} color="#ee1d23" style={styles.icon} />
                     <Text style={styles.dateText}>
@@ -402,26 +404,7 @@ const ClaimForm = () => {
                         }}
                     />
                 </View>
-                {/* product list start */}
-                <View style={styles.inputContainer}>
-                    <Icon name="cubes" size={20} color="#ee1d23" style={styles.icon} />
-                    <Dropdown
-                        style={styles.input}
-                        data={productList}
-                        labelField="label"
-                        valueField="value"
-                        placeholder="Select a product"
-                        itemTextStyle={styles.itemTextStyle}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        value={selectedProduct}
-                        onChange={item => {
-                            setSelectedProduct(item.value);
-                        }}
-                    />
-                </View>
-
-                {/* product list end */}
+             
 
                 <View style={styles.inputContainer}>
                     <Icon name="file-text" size={20} color="#ee1d23" style={styles.icon} />
@@ -434,29 +417,6 @@ const ClaimForm = () => {
                     />
                 </View>
 
-                <View style={styles.inputContainer}>
-                    <Icon name="dollar" size={20} color="#ee1d23" style={styles.icon} />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Total number of boxes"
-                        placeholderTextColor="grey"
-                        keyboardType="numeric"
-                        value={totalBoxes}
-                        onChangeText={setTotalBoxes}
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    <Icon name="money" size={20} color="#ee1d23" style={styles.icon} />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Total Amount"
-                        placeholderTextColor="grey"
-                        keyboardType="numeric"
-                        value={totalAmount}
-                        // onChangeText={setTotalAmount}
-                        editable={false}
-                    />
-                </View>
 
                 <View style={styles.inputContainer}>
                     <Icon name="truck" size={20} color="#ee1d23" style={styles.icon} />
@@ -474,7 +434,7 @@ const ClaimForm = () => {
                     <Icon name="info" size={20} color="#ee1d23" style={styles.icon} />
                     <TextInput
                         style={styles.input}
-                        placeholder="Claim Details"
+                        placeholder="Remark"
                         placeholderTextColor="grey"
                         multiline
                         numberOfLines={4}
@@ -484,7 +444,7 @@ const ClaimForm = () => {
                 </View>
 
                 <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
-                    <Text style={styles.fileButtonText}>Upload Invoice Images</Text>
+                    <Text style={styles.fileButtonText}>Upload Invoice Images / capture New</Text>
                 </TouchableOpacity>
 
                 {invoiceFiles.map((file, index) => (
@@ -498,7 +458,7 @@ const ClaimForm = () => {
                                         <Icon name="times-circle" size={15} color="red" />
                                     </TouchableOpacity>
                                 </View>
-                            ) : ( 
+                            ) : (
                                 <>
                                     <Image
                                         source={{ uri: file.uri }}
@@ -515,7 +475,7 @@ const ClaimForm = () => {
                 ))}
 
                 <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('transport')}>
-                    <Text style={styles.fileButtonText}>Upload Transport Receipt Images</Text>
+                    <Text style={styles.fileButtonText}>Upload Transport Receipt Images/ capture New</Text>
                 </TouchableOpacity>
 
                 {transportFiles.map((file, index) => (
@@ -558,16 +518,16 @@ const styles = StyleSheet.create({
         paddingTop: 20,
     },
     heading: {
-        fontSize: responsiveFontSize(2.5),
+        fontSize: responsiveFontSize(2),
         fontWeight: 'bold',
-        marginBottom: 20,
         textAlign: 'center',
         color: '#333',
+        marginBottom:responsiveHeight(2)
     },
     scrollContainer: {
         flexGrow: 1,
         justifyContent: 'center',
-        paddingVertical: 20,
+        paddingBottom: 20,
     },
     inputContainer: {
         flexDirection: 'row',
@@ -683,6 +643,15 @@ const styles = StyleSheet.create({
         height: 20,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    productButton: {
+        backgroundColor: '#fff',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginTop: 10,
+        borderWidth: 1,
+        borderColor: '#ee1d23',
     },
 });
 export default ClaimForm;

@@ -9,13 +9,12 @@ const Dashboard = () => {
 
   const phoneNumber = useSelector(state => state.phone.phoneNumber);
   const navigation = useNavigation();
-;
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         <Image style={styles.logo} source={require('../Images/logoWithoutbg.png')} />
-        <Text style={styles.heading}>Welcome to our Freight System</Text>
+        <Text style={styles.heading}>Welcome to our Bytegear Freight App</Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('Loginphone'); }}>
             <Icon name="log-in-outline" size={20} color="#fff" style={styles.icon} />

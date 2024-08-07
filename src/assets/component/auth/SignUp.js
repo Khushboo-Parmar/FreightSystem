@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, Image, ScrollView, Alert } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, Image, ScrollView, Alert, RefreshControl } from 'react-native';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DocumentPicker from 'react-native-document-picker';
@@ -7,7 +7,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
-import Recaptcha from 'react-native-recaptcha-that-works';
 
 const SignUpForm = () => {
     const route = useRoute();
@@ -23,8 +22,6 @@ const SignUpForm = () => {
     const [email, setEmail] = useState('');
     const [state, setState] = useState('');
     const [stateList, setStateList] = useState([]);
-
-    const [captchaVerified, setCaptchaVerified] = useState(false);
 
     const navigation = useNavigation();
 
@@ -161,35 +158,12 @@ const SignUpForm = () => {
 
         fetchStateList();
     }, []);
-    // useEffect(() => {
-    //     const fetchCityList = async () => {
-    //         try {
-    //             const response = await fetch(`${process.env.BASE_URL}city-name`);
-    //             const data = await response.json();
-    //             const cityNames = data.map(item => ({
-    //                 label: item.city_name,
-    //                 value: item.id,
-    //             }));
 
-    //             setCityList(cityNames);
-    //         } catch (error) {
-    //             console.error('Error fetching city list:', error.message);
-    //         }
-    //     };
-
-    //     fetchCityList();
-    // }, []);
 
     const removeFile = () => {
         setFile(null);
     };
 
-
-    // const handleCaptchaVerify = (token) => {
-    //     // Handle CAPTCHA token verification with your server here
-    //     setCaptchaVerified(true);
-    //     console.log('Captcha token:', token);
-    // };
 
 
     return (
@@ -295,13 +269,7 @@ const SignUpForm = () => {
                         )}
                     </View>
                 )}
-
-{/* <Recaptcha
-                    siteKey="YOUR_RECAPTCHA_SITE_KEY" // Replace with your reCAPTCHA site key
-                    onVerify={handleCaptchaVerify}
-                    onExpire={() => setCaptchaVerified(false)}
-                    size="normal"
-                />  */}
+    
                 <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
                     <Text style={styles.signupButtonText}>Sign Up</Text>
                 </TouchableOpacity>

@@ -82,6 +82,7 @@ const Loginphone = () => {
 };
 
 const styles = StyleSheet.create({
+    
     bgImagelogin: {
         height: responsiveHeight(30),
         width: responsiveWidth(100),

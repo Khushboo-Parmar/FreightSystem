@@ -7,7 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
-
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker'; 
 const SignUpForm = () => {
     const route = useRoute();
     const { userId } = route.params;
@@ -23,6 +23,9 @@ const SignUpForm = () => {
     const [state, setState] = useState('');
     const [stateList, setStateList] = useState([]);
 
+    const [robot, setRobot] = useState(false);
+
+
     const navigation = useNavigation();
 
     const handleFileUpload = async () => {
@@ -30,6 +33,14 @@ const SignUpForm = () => {
             Toast.show({
                 type: 'Error',
                 text1: 'Please select a file first',
+            });
+            return null;
+        }
+
+        if(!robot){
+            Toast.show({
+                type: 'Error',
+                text1: 'Please Verify',
             });
             return null;
         }
@@ -76,6 +87,7 @@ const SignUpForm = () => {
         if (!uploadedFileId) return;
 
         const formData = new FormData();
+        console.log('form data', formData);
         formData.append('full_name', partnerName);
         formData.append('gst_no', gstNo);
         formData.append('address', address);
@@ -94,6 +106,7 @@ const SignUpForm = () => {
                 body: formData,
             });
             const data = await response.json();
+            console.log('data response', data)
             if (data.status === 200) {
                 console.log('Success:', data);
                 Toast.show({
@@ -117,28 +130,81 @@ const SignUpForm = () => {
             });
         }
     };
-
-    const handleShopDocumentUpload = async () => {
-        try {
-            const res = await DocumentPicker.pick({
-                type: [DocumentPicker.types.images, DocumentPicker.types.pdf],
-                allowMultiSelection: false,
-            });
-
-            const selectedFile = {
-                uri: res[0].uri,
-                name: res[0].name,
-                type: res[0].type,
-            };
-            setFile(selectedFile);
-        } catch (err) {
-            if (DocumentPicker.isCancel(err)) {
-                console.log('User cancelled document picking');
-            } else {
-                console.log('Error picking document:', err);
-            }
-        }
+    const handleFileSelection = () => {
+        Alert.alert(
+            'Select Image Source',
+            'Choose the source for the image',
+            [
+                {
+                    text: 'Camera',
+                    onPress: () => launchCamera({
+                        mediaType: 'photo',
+                        includeBase64: false,
+                        quality: 1,
+                    }, response => {
+                        if (response.didCancel) {
+                            console.log('User cancelled image picker');
+                        } else if (response.errorCode) {
+                            console.log('ImagePicker Error: ', response.errorMessage);
+                        } else {
+                            setFile({
+                                uri: response.assets[0].uri,
+                                name: response.assets[0].fileName,
+                                type: response.assets[0].type,
+                            });
+                        }
+                    }),
+                },
+                {
+                    text: 'Gallery',
+                    onPress: () => launchImageLibrary({
+                        mediaType: 'photo',
+                        includeBase64: false,
+                        quality: 1,
+                    }, response => {
+                        if (response.didCancel) {
+                            console.log('User cancelled image picker');
+                        } else if (response.errorCode) {
+                            console.log('ImagePicker Error: ', response.errorMessage);
+                        } else {
+                            setFile({
+                                uri: response.assets[0].uri,
+                                name: response.assets[0].fileName,
+                                type: response.assets[0].type,
+                            });
+                            console.log('selected file', file);
+                        }
+                    }),
+                },
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: false }
+        );
     };
+    // const handleShopDocumentUpload = async () => {
+    //     try {
+    //         const res = await DocumentPicker.pick({
+    //             type: [DocumentPicker.types.images, DocumentPicker.types.pdf],
+    //             allowMultiSelection: false,
+    //         });
+
+    //         const selectedFile = {
+    //             uri: res[0].uri,
+    //             name: res[0].name,
+    //             type: res[0].type,
+    //         };
+    //         setFile(selectedFile);
+    //     } catch (err) {
+    //         if (DocumentPicker.isCancel(err)) {
+    //             console.log('User cancelled document picking');
+    //         } else {
+    //             console.log('Error picking document:', err);
+    //         }
+    //     }
+    // };
 
     useEffect(() => {
         const fetchStateList = async () => {
@@ -242,7 +308,7 @@ const SignUpForm = () => {
                     />
                 </View>
 
-                <TouchableOpacity style={styles.uploadButton} onPress={handleShopDocumentUpload}>
+                <TouchableOpacity style={styles.uploadButton}  onPress={handleFileSelection}>
                     <Text style={styles.uploadButtonText}>Upload Shop Images</Text>
                 </TouchableOpacity>
                 {file && (
@@ -269,7 +335,7 @@ const SignUpForm = () => {
                         )}
                     </View>
                 )}
-    
+    {/* <CaptchaV2Lib1 setRobot={setRobot} /> */}
                 <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
                     <Text style={styles.signupButtonText}>Sign Up</Text>
                 </TouchableOpacity>

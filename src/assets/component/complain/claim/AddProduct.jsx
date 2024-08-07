@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet, RefreshControl } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,7 +8,6 @@ import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {launchImageLibrary} from 'react-native-image-picker';
 
 const AddProduct = () => {
 
@@ -21,10 +20,10 @@ const AddProduct = () => {
     const [selectedProduct, setSelectedProduct] = useState('');
     const [productList, setProductList] = useState([]);
     const [productPrice, setProductPrice] = useState(0);
+    const [refreshing, setRefreshing] = useState(false);
     const formData = new FormData();
 
-    useEffect(() => {
-        const fetchProductList = async () => {
+        const fetchProductList = useCallback(async () => {
             try {
                 const response = await fetch(`${process.env.BASE_URL}productItem-list`);
                 const data = await response.json();
@@ -33,15 +32,20 @@ const AddProduct = () => {
                     value: item.id,
                     price: item.price
                 }));
-                console.warn('products', products)
+
                 setProductList(products);
             } catch (error) {
                 console.error('Error fetching product list:', error.message);
             }
-        };
-        fetchProductList();
-    }, []);
+            finally {
+                setRefreshing(false);
+            }
+        }, []);
 
+
+    useEffect(() => {
+        fetchProductList();
+    }, [fetchProductList]);
 
     useEffect(() => {
         const fetchProductPrice = async () => {
@@ -62,13 +66,37 @@ const AddProduct = () => {
         };
 
         fetchProductPrice();
-    }, [selectedProduct]);
+    }, [selectedProduct, productList]);
 
 
     useEffect(() => {
         const calculatedAmount = productPrice * (parseInt(totalBoxes) || 0);
         setTotalAmount(calculatedAmount.toFixed(2));
     }, [productPrice, totalBoxes]);
+
+    
+
+    const handleNext = () => {
+        if (parseFloat(totalAmount) > 10000) {
+            navigation.navigate('ClaimForm', {
+                totalBoxes,
+                totalAmount,
+                selectedProduct
+            });
+        } else {
+            console.log('Amount too low, showing toast');
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Amount',
+                text2: 'Your invoice amount must be greater than 10,000 to proceed with the claim.',
+            });
+        }
+    };
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        fetchProductList();
+    }, [fetchProductList]);
 
     return (
         <View style={styles.container}>
@@ -80,8 +108,19 @@ const AddProduct = () => {
                 <Text style={styles.title}>Product Details</Text>
 
             </View>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-
+        
+         
+            <ScrollView contentContainerStyle={styles.scrollContainer}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+            }
+            >
+            <View style={styles.noteContainer}>
+                <Text style={styles.noteText}>To claim, the invoice amount must be greater than 10,000.</Text>
+            </View>
                 <View style={styles.inputContainer}>
                     <Icon name="cubes" size={20} color="#ee1d23" style={styles.icon} />
                     <Dropdown
@@ -99,7 +138,7 @@ const AddProduct = () => {
                         }}
                     />
                 </View>
-                {/* product list end */}
+
                 <View style={styles.inputContainer}>
                     <Icon name="dollar" size={20} color="#ee1d23" style={styles.icon} />
                     <TextInput
@@ -119,17 +158,16 @@ const AddProduct = () => {
                         placeholderTextColor="grey"
                         keyboardType="numeric"
                         value={totalAmount}
-                        // onChangeText={setTotalAmount}
+        
                         editable={false}
                     />
                 </View>
 
-
-                <TouchableOpacity style={styles.submitButton} onPress={() => navigation.navigate('ClaimForm', {
-        totalBoxes,
-        totalAmount,
-        selectedProduct
-    })}>
+                 <TouchableOpacity
+                    style={[styles.submitButton, { opacity: parseFloat(totalAmount) > 10000 ? 1 : 0.5 }]}
+                    onPress={handleNext}
+                    disabled={parseFloat(totalAmount) <= 10000}
+                >
                     <Text style={styles.submitButtonText}>Next</Text>
                 </TouchableOpacity>
             </ScrollView>
@@ -225,6 +263,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         color: 'black',
+    },
+    noteContainer: {
+        backgroundColor: '#ffefef',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 20,
+    },
+    noteText: {
+        color: '#ff0000',
+        fontSize: responsiveFontSize(1.8),
+        textAlign: 'center',
     },
 });
 export default AddProduct;

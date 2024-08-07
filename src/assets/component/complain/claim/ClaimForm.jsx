@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet ,RefreshControl} from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet ,RefreshControl,ToastAndroid } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useNavigation,useRoute } from '@react-navigation/native';
 import DocumentPicker from 'react-native-document-picker';
@@ -136,71 +136,44 @@ const ClaimForm = () => {
     
     const handleSubmitClaim = async () => {
         console.log('Submitting claim...');
-        if (invoiceFiles.length === 0) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Invoice images are required.',
-            });
-
-            return;
-        }
         if (!selectedDate) {
-
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Date of purchase is required.',
-            });
+            ToastAndroid.show('Date of purchase is required.', ToastAndroid.SHORT);
             return;
         }
+
         if (!selectedDistributor) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Distributor is required.',
-            });
+            ToastAndroid.show('Distributor is required.', ToastAndroid.SHORT);
             console.log('Distributor is missing');
             return;
         }
-        
+        if (!invoiceNo) {
+            ToastAndroid.show('invoiceNo is required.', ToastAndroid.SHORT);
+            console.log('invoiceNo is missing');
+            return;
+        }
         if (!totalAmount) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Total amount is required.',
-            });
+            ToastAndroid.show('Total amount is required.', ToastAndroid.SHORT);
             return;
         }
         if (!freightAmount) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Freight amount is required.',
-            });
+            ToastAndroid.show('Freight amount is required.', ToastAndroid.SHORT);
             return;
         }
-        if (!claimDetails) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Claim details are required.',
-            });
+        if (invoiceFiles.length === 0) {
+            ToastAndroid.show('Invoice images are required.', ToastAndroid.SHORT);
             return;
         }
+
 
         const fifteenDaysAgo = new Date();
         fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
 
         if (selectedDate < fifteenDaysAgo) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Sorry, you cannot submit the claim form for purchases made more than 15 days ago.',
-            });
-
+            ToastAndroid.show('Sorry, you cannot submit the claim form for purchases made more than 15 days ago.', ToastAndroid.SHORT);
             return;
         }
+
+
 
         console.log('Uploading files...');
         const uploadedInvoiceFileIds = await Promise.all(invoiceFiles.map(handleFileUpload));
@@ -299,6 +272,7 @@ const ClaimForm = () => {
         fetchDistributorList();
     }, []);
 
+
     const removeFile = (type, index) => {
         if (type === 'invoice') {
             setInvoiceFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
@@ -306,54 +280,7 @@ const ClaimForm = () => {
             setTransportFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
         }
     };
-    useEffect(() => {
-        const fetchProductList = async () => {
-            try {
-                const response = await fetch(`${process.env.BASE_URL}productItem-list`);
-                const data = await response.json();
-                const products = data.map(item => ({
-                    label: item.product_name,
-                    value: item.id,
-                    price: item.price
-                }));
-                console.warn('products', products)
-                setProductList(products);
-            } catch (error) {
-                console.error('Error fetching product list:', error.message);
-            }
-        };
-        fetchProductList();
-    }, []);
-
-    // product price
-
-    useEffect(() => {
-        const fetchProductPrice = async () => {
-            try {
-                const product = productList.find(p => p.value === selectedProduct);
-                if (product) {
-                    setProductPrice(product.price);
-                } else {
-                    setProductPrice(0);
-                }
-            } catch (error) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error',
-                    text2: 'Failed to fetch product price.',
-                });
-            }
-        };
-
-        fetchProductPrice();
-    }, [selectedProduct]);
-
-
-    useEffect(() => {
-        const calculatedAmount = productPrice * (parseInt(totalBoxes) || 0);
-        setTotalAmount(calculatedAmount.toFixed(2));
-    }, [productPrice, totalBoxes]);
-
+  
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
         setTimeout(() => {
@@ -362,9 +289,6 @@ const ClaimForm = () => {
       }, []);
 
 
-    const handleAddProductDetils =()=>{
-        navigation.navigate('AddProduct')
-    }
     return (
         <View style={styles.container}>
             <Text style={styles.heading}>Freight Claim Form</Text>
@@ -533,7 +457,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 15,
-        // borderWidth: 1,
         borderBottomWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,

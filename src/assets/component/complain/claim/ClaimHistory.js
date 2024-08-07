@@ -6,7 +6,6 @@ import { useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
 import placeholderImg from '../../../Images/placeImg.jpg';
 
 const placeholderImage = placeholderImg;
@@ -35,11 +34,9 @@ const ClaimHistory = () => {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-
                 if (!response.ok) {
                     throw new Error(`Failed to fetch complaints: ${response.statusText}`);
                 }
-
                 const data = await response.json();
                 if (response.ok) {
                     setComplaints(data);

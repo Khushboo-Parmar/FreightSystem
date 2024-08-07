@@ -17,7 +17,7 @@ const App = () => {
         <NavigationContainer>
           <DrawerNavigatorPage />
         </NavigationContainer>
-        {/* <AppNavigator/> */}
+
         <Toast />
       </PersistGate>
     </Provider>

@@ -54,7 +54,6 @@ const AppNavigator = () => {
         <Stack.Screen name="GeneralTerms" component={GeneralTerms} options={{ headerShown: false }} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{ headerShown: false }} />
         <Stack.Screen name="DisclaimerPolicy" component={DisclaimerPolicy} options={{ headerShown: false }} />
-        <Stack.Screen name="CameraTaking" component={CameraTaking} options={{ headerShown: false }} />
       </Stack.Navigator>
 //  </NavigationContainer>
   );

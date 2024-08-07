@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { clearUser } from '../../reduxFeatures/content/userReducer';
+// import { clearUser } from '../../reduxFeatures/content/userReducer';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyPieChart from './MyPieChart';
@@ -77,24 +77,24 @@ const LoginDashboard = () => {
         fetchDashboardData();
     }, []);
     
-    const handleLogout = async () => {
-        try {
-            dispatch(clearUser());
-            Toast.show({
-                type: 'success',
-                text1: 'Logging out',
-                text2: 'Thank you!',
-            });
-            navigation.navigate('Dashboard');
-        } catch (error) {
-            console.error('Error during logout:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to logout. Please try again.',
-            });
-        }
-    };
+    // const handleLogout = async () => {
+    //     try {
+    //         dispatch(clearUser());
+    //         Toast.show({
+    //             type: 'success',
+    //             text1: 'Logging out',
+    //             text2: 'Thank you!',
+    //         });
+    //         navigation.navigate('Dashboard');
+    //     } catch (error) {
+    //         console.error('Error during logout:', error);
+    //         Toast.show({
+    //             type: 'error',
+    //             text1: 'Error',
+    //             text2: 'Failed to logout. Please try again.',
+    //         });
+    //     }
+    // };
 
 
 

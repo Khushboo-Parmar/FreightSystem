@@ -7,6 +7,7 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import placeholderImg from '../../../Images/placeImg.jpg';
+import FilterSelect from "./FilterSelect";
 
 const placeholderImage = placeholderImg;
 const ClaimHistory = () => {
@@ -158,7 +159,7 @@ const ClaimHistory = () => {
                 <Text style={styles.title}>Claim History</Text>
 
             </View>
-
+            <FilterSelect />
             {loading ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#ee1d23" />

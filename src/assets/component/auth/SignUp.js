@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'; 
+import CaptchaV2Lib1 from './Recaptcha/Recaptcha';
 const SignUpForm = () => {
     const route = useRoute();
     const { userId } = route.params;
@@ -184,27 +185,7 @@ const SignUpForm = () => {
             { cancelable: false }
         );
     };
-    // const handleShopDocumentUpload = async () => {
-    //     try {
-    //         const res = await DocumentPicker.pick({
-    //             type: [DocumentPicker.types.images, DocumentPicker.types.pdf],
-    //             allowMultiSelection: false,
-    //         });
 
-    //         const selectedFile = {
-    //             uri: res[0].uri,
-    //             name: res[0].name,
-    //             type: res[0].type,
-    //         };
-    //         setFile(selectedFile);
-    //     } catch (err) {
-    //         if (DocumentPicker.isCancel(err)) {
-    //             console.log('User cancelled document picking');
-    //         } else {
-    //             console.log('Error picking document:', err);
-    //         }
-    //     }
-    // };
 
     useEffect(() => {
         const fetchStateList = async () => {

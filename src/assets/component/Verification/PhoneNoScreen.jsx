@@ -57,6 +57,7 @@ const PhoneNoScreen = () => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.phoneInput}
+          // style={[styles.phoneInput, { backgroundColor: 'red' }]}
           value={phoneNumberinput}
           onChangeText={setPhoneNumberInput}
           keyboardType="phone-pad"

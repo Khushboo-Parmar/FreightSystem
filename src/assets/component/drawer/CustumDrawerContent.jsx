@@ -11,49 +11,25 @@ import Toast from 'react-native-toast-message';
 
 const CustomDrawerContent = (props) => {
   const navigation = useNavigation();
-  const handleLogout = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      if (!token) {
-        throw new Error("Token not found");
-      }
-      console.log('Token:', token);
-
-      const response = await fetch(`${process.env.BASE_URL}claimuser-logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-
-        dispatch(setUser([]));
-        // dispatch(clearUser());
-        Toast.show({
-          type: 'success',
-          text1: 'Logging out',
-          text2: 'Thank you! 😊',
-        });
-        await AsyncStorage.removeItem('token');
-        navigation.navigate('LoginPhone');
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Failed to logout. Please try again.',
-        });;
-      }
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to logout. Please try again.',
-      });
-    }
-  };
-
+  const dispatch = useDispatch();
+   const handleLogout = async () => {
+        try {
+            dispatch(clearUser());
+            Toast.show({
+                type: 'success',
+                text1: 'Logging out',
+                text2: 'Thank you!',
+            });
+            navigation.navigate('Dashboard');
+        } catch (error) {
+            console.error('Error during logout:', error);
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to logout. Please try again.',
+            });
+        }
+    };
   let DrawerList = [
     { icon: 'file-document', label: 'Disclaimer Policy', navigateTo: 'DisclaimerPolicy' },
     { icon: 'home', label: 'General Terms', navigateTo: 'GeneralTerms' },
@@ -94,7 +70,6 @@ const CustomDrawerContent = (props) => {
         <View style={styles.logoContainer}>
           <Image
             source={require('../../Images/BTIcon.png')}
-            // source={require('../../Images/logoWithoutbg.png')}
             style={styles.logo}
           />
         </View>
@@ -104,12 +79,9 @@ const CustomDrawerContent = (props) => {
     </View>
   );
 };
-
-
 const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
-    // marginVertical: responsiveHeight(2),
   },
   logo: {
     width: responsiveWidth(20),

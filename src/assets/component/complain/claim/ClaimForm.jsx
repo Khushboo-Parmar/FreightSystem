@@ -51,14 +51,14 @@ const ClaimForm = () => {
             });
             return null;
         }
-
+    
         const formData = new FormData();
         formData.append('files[]', {
             uri: file.uri,
             name: file.name,
             type: file.type,
         });
-
+    
         try {
             const response = await fetch(`${process.env.BASE_URL}multi-file`, {
                 method: 'POST',
@@ -68,15 +68,20 @@ const ClaimForm = () => {
                 },
                 body: formData,
             });
-            console.warn('formdata=', formData)
+    
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
             const data = await response.json();
+            
+            console.log('Response data:', data);
+    
             if (data.status === 200) {
                 console.log('File uploaded successfully:', data.file_id);
                 return data.file_id;
             } else {
                 console.error('File upload error:', data.message);
                 Toast.show({
-                    type: 'Error',
+                    type: 'error',
                     text1: 'File upload failed',
                     text2: data.message,
                 });
@@ -92,6 +97,57 @@ const ClaimForm = () => {
             return null;
         }
     };
+    
+    // const handleFileUpload = async (file) => {
+    //     if (!file) {
+    //         Toast.show({
+    //             type: 'error',
+    //             text1: 'Error',
+    //             text2: 'Please select a file first.',
+    //         });
+    //         return null;
+    //     }
+
+    //     const formData = new FormData();
+    //     formData.append('files[]', {
+    //         uri: file.uri,
+    //         name: file.name,
+    //         type: file.type,
+    //     });
+
+    //     try {
+    //         const response = await fetch(`${process.env.BASE_URL}multi-file`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'multipart/form-data',
+    //             },
+    //             body: formData,
+    //         });
+    //         console.warn('formdata=', formData)
+    //         const data = await response.json();
+    //         if (data.status === 200) {
+    //             console.log('File uploaded successfully:', data.file_id);
+    //             return data.file_id;
+    //         } else {
+    //             console.error('File upload error:', data.message);
+    //             Toast.show({
+    //                 type: 'Error',
+    //                 text1: 'File upload failed',
+    //                 text2: data.message,
+    //             });
+    //             return null;
+    //         }
+    //     } catch (error) {
+    //         console.error('Error uploading file:', error);
+    //         Toast.show({
+    //             type: 'error',
+    //             text1: 'Error',
+    //             text2: 'Failed to upload the file. Please check your network connection and try again.',
+    //         });
+    //         return null;
+    //     }
+    // };
 
     const handleFileSelection = async (type) => {
         try {
@@ -203,6 +259,7 @@ const ClaimForm = () => {
             formData.append(`transport_receipt`, fileId);
         });
 
+
         console.log('Form data:', formData);
 
         try {
@@ -241,7 +298,7 @@ const ClaimForm = () => {
             } else {
 
                 Toast.show({
-                    type: 'Error',
+                    type: 'error',
                     text1: 'Claim submission failed',
                     text2: data.message,
                 });
@@ -367,7 +424,7 @@ const ClaimForm = () => {
                     />
                 </View>
 
-                <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
+                {/* <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
                     <Text style={styles.fileButtonText}>Upload Invoice Images / capture New</Text>
                 </TouchableOpacity>
 
@@ -426,7 +483,43 @@ const ClaimForm = () => {
                             )}
                         </View>
                     </ScrollView>
-                ))}
+                ))} */}
+                <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
+    <Text style={styles.fileButtonText}>Upload Invoice Images / Capture New</Text>
+</TouchableOpacity>
+
+{invoiceFiles.map((file, index) => (
+    <ScrollView horizontal key={index} style={styles.filePreviewContainer}>
+        <View style={styles.filePreview}>
+            <Image
+                source={{ uri: file.uri }}
+                style={styles.uploadedImage}
+            />
+            <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('invoice', index)}>
+                <Icon name="times-circle" size={15} color="red" />
+            </TouchableOpacity>
+        </View>
+    </ScrollView>
+))}
+
+<TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('transport')}>
+    <Text style={styles.fileButtonText}>Upload Transport Receipt Images / Capture New</Text>
+</TouchableOpacity>
+
+{transportFiles.map((file, index) => (
+    <ScrollView horizontal key={index} style={styles.filePreviewContainer}>
+        <View style={styles.filePreview}>
+            <Image
+                source={{ uri: file.uri }}
+                style={styles.uploadedImage}
+            />
+            <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('transport', index)}>
+                <Icon name="times-circle" size={15} color="red" />
+            </TouchableOpacity>
+        </View>
+    </ScrollView>
+))}
+
                 <TouchableOpacity style={styles.submitButton} onPress={handleSubmitClaim}>
                     <Text style={styles.submitButtonText}>Submit Claim</Text>
                 </TouchableOpacity>

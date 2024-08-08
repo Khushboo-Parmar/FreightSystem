@@ -18,6 +18,7 @@ const ClaimHistory = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    
     useEffect(() => {
         const fetchComplaints = async () => {
             setLoading(true);
@@ -159,7 +160,7 @@ const ClaimHistory = () => {
                 <Text style={styles.title}>Claim History</Text>
 
             </View>
-            <FilterSelect />
+           {index === 1 && <FilterSelect />}
             {loading ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#ee1d23" />
@@ -176,7 +177,7 @@ const ClaimHistory = () => {
                     initialLayout={{ width: responsiveWidth(100) }}
                 />
             )}
-            <TouchableOpacity onPress={() => navigation.navigate('ClaimForm')} style={styles.addButton}>
+            <TouchableOpacity onPress={() => navigation.navigate('AddProduct')} style={styles.addButton}>
                 <Text style={styles.buttonText}>Add More Complaints</Text>
             </TouchableOpacity>
         </View>

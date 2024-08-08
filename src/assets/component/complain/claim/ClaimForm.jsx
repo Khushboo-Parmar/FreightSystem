@@ -21,13 +21,9 @@ const ClaimForm = () => {
     const [totalBoxes, setTotalBoxes] = useState(route.params?.totalBoxes );
     const [totalAmount, setTotalAmount] = useState(route.params?.totalAmount);
     // console.log('totalAmount from route ', route.params?.totalBoxes)
-
-
     // console.warn('totalBoxes from route ', totalBoxes)
     console.warn('product from route ',selectedProduct)
     const [selectedProduct, setSelectedProduct] = useState(route.params?.selectedProduct);
-
-
     const [claimDetails, setClaimDetails] = useState('');
     const [selectedDate, setSelectedDate] = useState(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -364,7 +360,7 @@ const ClaimForm = () => {
                 <TouchableOpacity style={styles.inputContainer} onPress={showDatePicker}>
                     <Icon name="calendar" size={20} color="#ee1d23" style={styles.icon} />
                     <Text style={styles.dateText}>
-                        {selectedDate ? selectedDate.toLocaleDateString() : 'Select Date of Purchase'}
+                        {selectedDate ? selectedDate.toLocaleDateString() : 'SELECT DATE OF PURCHASE'}
                     </Text>
                 </TouchableOpacity>
                 <DateTimePickerModal
@@ -382,7 +378,7 @@ const ClaimForm = () => {
                         data={distributorList}
                         labelField="label"
                         valueField="value"
-                        placeholder="Distributor Name"
+                        placeholder="DISTRIBUTOR NAME"
                         itemTextStyle={styles.itemTextStyle}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
@@ -402,7 +398,7 @@ const ClaimForm = () => {
                     <Icon name="file-text" size={20} color="#ee1d23" style={styles.icon} />
                     <TextInput
                         style={styles.input}
-                        placeholder="Invoice No."
+                        placeholder="INVOICE No."
                         placeholderTextColor="grey"
                         value={invoiceNo}
                         onChangeText={setInvoiceNo}
@@ -414,7 +410,7 @@ const ClaimForm = () => {
                     <Icon name="truck" size={20} color="#ee1d23" style={styles.icon} />
                     <TextInput
                         style={styles.input}
-                        placeholder="Freight Amount"
+                        placeholder="FREIGHT AMOUNT"
                         placeholderTextColor="grey"
                         keyboardType="numeric"
                         value={freightAmount}
@@ -426,7 +422,7 @@ const ClaimForm = () => {
                     <Icon name="info" size={20} color="#ee1d23" style={styles.icon} />
                     <TextInput
                         style={styles.input}
-                        placeholder="Remark"
+                        placeholder="REMARK"
                         placeholderTextColor="grey"
                         multiline
                         numberOfLines={4}
@@ -576,6 +572,7 @@ const styles = StyleSheet.create({
         height: responsiveHeight(6),
         fontSize: responsiveFontSize(2),
         color: '#333',
+        textTransform:'uppercase'
 
     },
     dateText: {
@@ -594,8 +591,9 @@ const styles = StyleSheet.create({
     },
     fileButtonText: {
         color: '#ee1d23',
-        fontSize: 16,
+        fontSize: responsiveFontSize(1.6),
         textAlign: 'center',
+        // textTransform:'uppercase'
     },
     filePreview: {
         marginTop: 10,

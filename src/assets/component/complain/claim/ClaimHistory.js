@@ -13,6 +13,7 @@ const placeholderImage = placeholderImg;
 const ClaimHistory = () => {
     const navigation = useNavigation();
     const user = useSelector(state => state.user.user);
+    console.log('user claim histry', user)
     const userId = user.id;
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -177,7 +178,7 @@ const ClaimHistory = () => {
                     initialLayout={{ width: responsiveWidth(100) }}
                 />
             )}
-            <TouchableOpacity onPress={() => navigation.navigate('AddProduct')} style={styles.addButton}>
+            <TouchableOpacity onPress={() => navigation.navigate('ClaimForm')} style={styles.addButton}>
                 <Text style={styles.buttonText}>Add More Complaints</Text>
             </TouchableOpacity>
         </View>
@@ -205,7 +206,6 @@ const styles = StyleSheet.create({
         fontSize: responsiveFontSize(2),
         fontWeight: 'bold',
         textAlign: 'center',
-        // marginBottom: responsiveHeight(2),
         color: 'black',
     },
     loadingContainer: {

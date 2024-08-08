@@ -1,37 +1,45 @@
-import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
-import ConfirmGoogleCaptcha from 'react-native-google-recaptcha-v2';
+import React, { useRef, useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Alert, LogBox } from 'react-native';
+import Recaptcha from 'react-native-recaptcha-that-works';
 import { responsiveHeight } from 'react-native-responsive-dimensions';
 
-const CaptchaV2Lib1 = ({setRobot}) => {
+LogBox.ignoreLogs(['Warning: Each child in a list should have a unique "key" prop.']);
+
+const CaptchaV2Lib1 = ({ setRobot }) => {
+  const recaptcha = useRef(null);
   const [isChecked, setIsChecked] = useState(false);
-  const [showCaptcha, setShowCaptcha] = useState(false);
-  const captchaFormRef = useRef(null);
+
   const handleCheckboxClick = () => {
-    setIsChecked(!isChecked);
     if (!isChecked) {
-      setShowCaptcha(true);
-      setTimeout(() => {
-        if (captchaFormRef.current) {
-          captchaFormRef.current.show();
-        }
-      }, 100);
-    } else {
-        setRobot(true)
-      setShowCaptcha(false);
+      if (recaptcha.current) {
+        recaptcha.current.open();
+      } else {
+        console.error('recaptcha reference is null');
+      }
     }
+    setIsChecked(!isChecked);
+  };
+
+  const onVerify = token => {
+    // console.log('Verified successfully!', token);
+    setRobot(true);
+  };
+
+  const onExpire = () => {
+    console.log('Captcha expired');
+  };
+
+  const onError = err => {
+    console.error('Captcha error:', err);
+    Alert.alert('Captcha Error', 'An error occurred while verifying the captcha.');
   };
 
   const onMessage = event => {
-    console.log('event--->>>>', event.nativeEvent.data);
-
-    if (event && event.nativeEvent.data) {
-      if (['cancel', 'error', 'expired'].includes(event.nativeEvent.data)) {
-        console.log('reCAPTCHA error:', event.nativeEvent.data);
-        setShowCaptcha(false);
-        return;
-      } else {
-        setShowCaptcha(false);
+    if (event && event.nativeEvent && event.nativeEvent.data) {
+      const message = event.nativeEvent.data;
+      if (['cancel', 'error', 'expired'].includes(message)) {
+        console.log('reCAPTCHA error:', message);
+        Alert.alert('Captcha Error', `reCAPTCHA ${message}`);
       }
     }
   };
@@ -44,26 +52,22 @@ const CaptchaV2Lib1 = ({setRobot}) => {
         </View>
         <Text style={styles.label}>I am not a robot</Text>
       </TouchableOpacity>
-      {showCaptcha && (
-        <ConfirmGoogleCaptcha
-          ref={captchaFormRef}
-          baseUrl={'https://genics.in/'} 
-          languageCode="en"
-          onMessage={onMessage}
-        //   siteKey={'6LeRPSEqAAAAAP6-F9NniLfXZXdNptfISC6TiRM6'}
-          siteKey={'6LfqSyEqAAAAALcIJiqPs7z7ZlhxQLg9giCcURfF'}
-          theme="light"
-        />
-      )}
+      <Recaptcha
+        ref={recaptcha}
+        siteKey="6LeRPSEqAAAAAP6-F9NniLfXZXdNptfISC6TiRM6"
+        baseUrl="https://genics.in/"
+        onVerify={onVerify}
+        onExpire={onExpire}
+        onError={onError}
+        onMessage={onMessage}
+      />
     </View>
   );
 };
 
-export default CaptchaV2Lib1;
-
 const styles = StyleSheet.create({
   container: {
-    marginTop:responsiveHeight(3),
+    marginTop: responsiveHeight(3),
     justifyContent: 'center',
   },
   checkboxContainer: {
@@ -93,3 +97,5 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+
+export default CaptchaV2Lib1;

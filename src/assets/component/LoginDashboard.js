@@ -178,7 +178,7 @@ const LoginDashboard = () => {
                             <View style={styles.card}>
                                 <Text style={styles.welcomeText}>We are pleased to help you</Text>
                                 <View style={styles.buttonView}>
-                                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AddProduct')}>
+                                    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ClaimForm')}>
                                         <Ionicons name="add-circle-outline" size={24} color="white" />
                                         <Text style={styles.buttonText}>Add Claim</Text>
                                     </TouchableOpacity>

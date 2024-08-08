@@ -153,6 +153,7 @@ const SignUpForm = () => {
                                 name: response.assets[0].fileName,
                                 type: response.assets[0].type,
                             });
+                            console.log('selected file1', file);
                         }
                     }),
                 },
@@ -173,7 +174,7 @@ const SignUpForm = () => {
                                 name: response.assets[0].fileName,
                                 type: response.assets[0].type,
                             });
-                            console.log('selected file', file);
+                            console.log('selected file2', file);
                         }
                     }),
                 },
@@ -227,12 +228,13 @@ const SignUpForm = () => {
                         placeholderTextColor="grey"
                         value={partnerName}
                         onChangeText={setPartnerName}
+                        
                     />
                 </View>
                 <View style={styles.inputContainer}>
                     <Icon name="envelope" size={20} color="#ee1d23" style={styles.icon} />
                     <TextInput
-                        style={styles.input}
+                        style={styles.inputemail}
                         placeholder="MAIL ID"
                         keyboardType="email-address"
                         value={email}
@@ -316,7 +318,7 @@ const SignUpForm = () => {
                         )}
                     </View>
                 )}
-    {/* <CaptchaV2Lib1 setRobot={setRobot} /> */}
+    <CaptchaV2Lib1 setRobot={setRobot} />
                 <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
                     <Text style={styles.signupButtonText}>Sign Up</Text>
                 </TouchableOpacity>
@@ -346,6 +348,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: responsiveWidth(3),
     },
     input: {
+        flex: 1,
+        height: responsiveHeight(6),
+        paddingHorizontal: responsiveWidth(2.5),
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        fontSize: responsiveFontSize(1.8),
+        color: 'black',
+        textTransform:'uppercase'
+    },
+    inputemail: {
         flex: 1,
         height: responsiveHeight(6),
         paddingHorizontal: responsiveWidth(2.5),

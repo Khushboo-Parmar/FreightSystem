@@ -18,9 +18,16 @@ const ClaimForm = () => {
     const navigation = useNavigation();
 
     const route = useRoute();
-    const [totalBoxes, setTotalBoxes] = useState(route.params?.totalBoxes || '');
-    const [totalAmount, setTotalAmount] = useState(route.params?.totalAmount || '');
-    const [selectedProduct, setSelectedProduct] = useState(route.params?.selectedProduct || '');
+    const [totalBoxes, setTotalBoxes] = useState(route.params?.totalBoxes );
+    const [totalAmount, setTotalAmount] = useState(route.params?.totalAmount);
+    // console.log('totalAmount from route ', route.params?.totalBoxes)
+
+
+    // console.warn('totalBoxes from route ', totalBoxes)
+    console.warn('product from route ',selectedProduct)
+    const [selectedProduct, setSelectedProduct] = useState(route.params?.selectedProduct);
+
+
     const [claimDetails, setClaimDetails] = useState('');
     const [selectedDate, setSelectedDate] = useState(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -387,6 +394,10 @@ const ClaimForm = () => {
                 </View>
              
 
+             <TouchableOpacity  style={styles.productButtonstyle} onPress={() => navigation.navigate('AddProduct')}>
+                <Text style={styles.productBtntext}><Icon name="plus" size={15} color="white" />  ADD PRODUCT DETAIL</Text>
+             </TouchableOpacity>
+
                 <View style={styles.inputContainer}>
                     <Icon name="file-text" size={20} color="#ee1d23" style={styles.icon} />
                     <TextInput
@@ -669,5 +680,16 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ee1d23',
     },
+    productButtonstyle:{
+        backgroundColor:'#ee1d23',
+        padding:responsiveWidth(3),
+        alignSelf:'flex-end',
+        borderRadius: 10,
+    },
+    productBtntext:{
+        color: 'white',
+        fontSize:responsiveFontSize(1.8),
+        fontWeight:'400'
+    }
 });
 export default ClaimForm;

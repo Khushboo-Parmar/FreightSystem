@@ -8,6 +8,8 @@ import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { xorBy } from 'lodash'
+import SelectBox from 'react-native-multi-selectbox'
 
 const AddProduct = () => {
 
@@ -23,24 +25,27 @@ const AddProduct = () => {
     const [refreshing, setRefreshing] = useState(false);
     const formData = new FormData();
 
-        const fetchProductList = useCallback(async () => {
-            try {
-                const response = await fetch(`${process.env.BASE_URL}productItem-list`);
-                const data = await response.json();
-                const products = data.map(item => ({
-                    label: item.product_name,
-                    value: item.id,
-                    price: item.price
-                }));
+    const [selectedTeam, setSelectedTeam] = useState({})
+    const [selectedTeams, setSelectedTeams] = useState([])
 
-                setProductList(products);
-            } catch (error) {
-                console.error('Error fetching product list:', error.message);
-            }
-            finally {
-                setRefreshing(false);
-            }
-        }, []);
+    const fetchProductList = useCallback(async () => {
+        try {
+            const response = await fetch(`${process.env.BASE_URL}productItem-list`);
+            const data = await response.json();
+            const products = data.map(item => ({
+                label: item.product_name,
+                value: item.id,
+                price: item.price
+            }));
+
+            setProductList(products);
+        } catch (error) {
+            console.error('Error fetching product list:', error.message);
+        }
+        finally {
+            setRefreshing(false);
+        }
+    }, []);
 
 
     useEffect(() => {
@@ -69,12 +74,12 @@ const AddProduct = () => {
     }, [selectedProduct, productList]);
 
 
-    useEffect(() => {
-        const calculatedAmount = productPrice * (parseInt(totalBoxes) || 0);
-        setTotalAmount(calculatedAmount.toFixed(2));
-    }, [productPrice, totalBoxes]);
+    // useEffect(() => {
+    //     const calculatedAmount = productPrice * (parseInt(totalBoxes) || 0);
+    //     setTotalAmount(calculatedAmount.toFixed(2));
+    // }, [productPrice, totalBoxes]);
 
-    
+
 
     const handleNext = () => {
         if (parseFloat(totalAmount) > 10000) {
@@ -97,6 +102,28 @@ const AddProduct = () => {
         setRefreshing(true);
         fetchProductList();
     }, [fetchProductList]);
+    const K_OPTIONS = [
+        {
+            item: 'Juventus',
+            id: 'JUVE',
+        },
+        {
+            item: 'Real Madrid',
+            id: 'RM',
+        },
+        {
+            item: 'Barcelona',
+            id: 'BR',
+        },]
+
+    function onMultiChange() {
+        return (item) => setSelectedTeams(xorBy(selectedTeams, [item], 'id'))
+    }
+
+    function onChange() {
+        return (val) => setSelectedTeam(val)
+    }
+
 
     return (
         <View style={styles.container}>
@@ -108,19 +135,25 @@ const AddProduct = () => {
                 <Text style={styles.title}>Product Details</Text>
 
             </View>
-        
-         
+
+
             <ScrollView contentContainerStyle={styles.scrollContainer}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                />
-            }
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
             >
-            <View style={styles.noteContainer}>
-                <Text style={styles.noteText}>To claim, the invoice amount must be greater than 10,000.</Text>
-            </View>
+                <View style={styles.noteContainer}>
+                    <Text style={styles.noteText}>To claim, the invoice amount must be greater than 10,000.</Text>
+                </View>
+
+
+
+
+                {/* 
+
                 <View style={styles.inputContainer}>
                     <Icon name="cubes" size={20} color="#ee1d23" style={styles.icon} />
                     <Dropdown
@@ -137,7 +170,19 @@ const AddProduct = () => {
                             setSelectedProduct(item.value);
                         }}
                     />
+                </View> */}
+                <View style={styles.inputContainer}>
+                    <SelectBox
+                        label="Select products"
+                        options={productList}
+                        selectedValues={selectedProducts}
+                        onMultiSelect={handleMultiChange}
+                        onTapClose={handleMultiChange}
+                        isMulti
+                    />
                 </View>
+
+
 
                 <View style={styles.inputContainer}>
                     <Icon name="dollar" size={20} color="#ee1d23" style={styles.icon} />
@@ -158,20 +203,23 @@ const AddProduct = () => {
                         placeholderTextColor="grey"
                         keyboardType="numeric"
                         value={totalAmount}
-        
-                        editable={false}
+                        onChangeText={setTotalAmount}
+
+                    // editable={false}
                     />
                 </View>
 
-                 <TouchableOpacity
+
+
+                <TouchableOpacity
                     style={[styles.submitButton, { opacity: parseFloat(totalAmount) > 10000 ? 1 : 0.5 }]}
                     onPress={handleNext}
                     disabled={parseFloat(totalAmount) <= 10000}
                 >
                     <Text style={styles.submitButtonText}>Next</Text>
                 </TouchableOpacity>
-            </ScrollView>
-        </View>
+            </ScrollView >
+        </View >
     );
 }
 const styles = StyleSheet.create({

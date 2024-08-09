@@ -54,17 +54,28 @@ const PhoneNoScreen = () => {
       <Image style={styles.logo} source={require('../../Images/logoWithoutbg.png')} />
       <Text style={styles.label}>Verify your phone number</Text>
       <Text style={styles.label2}>Please enter your mobile number to receive a verification code </Text>
-      <View style={styles.inputContainer}>
+      {/* <View style={styles.inputContainer}>
         <TextInput
-          style={styles.phoneInput}
-          // style={[styles.phoneInput, { backgroundColor: 'red' }]}
+          // style={styles.phoneInput}
+          style={[styles.input, { backgroundColor: 'red' }]}
           value={phoneNumberinput}
           onChangeText={setPhoneNumberInput}
           keyboardType="phone-pad"
           placeholder="Phone Number"
           placeholderTextColor="gray"
         />
-      </View>
+      </View> */}
+       <Text style={styles.labelphone}>
+                    <Icon name="user" size={20} color="#ee1d23" /> {' '}Phone Number:
+                </Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter your phone number"
+                    placeholderTextColor="#aaa"
+                    onChangeText={setPhoneNumberInput}
+                    value={phoneNumberinput}
+                    autoCapitalize="none"
+                />
       <TouchableOpacity onPress={sendVerificationCode} style={styles.sendBtn}>
         <Icon name="send" size={20} color="#fff" />
         <Text style={styles.sendBtnText}>SEND OTP</Text>
@@ -93,6 +104,12 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
   },
+  labelphone: {
+    fontSize: responsiveFontSize(2),
+    marginBottom: responsiveHeight(1),
+    color: 'black',
+    fontWeight:"600"
+},
   label2: {
     fontSize: responsiveFontSize(1.8),
     marginBottom: responsiveHeight(4),
@@ -112,10 +129,16 @@ const styles = StyleSheet.create({
     padding: responsiveHeight(1.5),
     color: '#333',
   },
-  phoneInput: {
-    padding: responsiveHeight(1.5),
-    color: 'black',
-  },
+  input: {
+    height: responsiveHeight(6),
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: responsiveHeight(2),
+    paddingLeft: responsiveHeight(3),
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    color: "black"
+},
   sendBtn: {
     flexDirection: 'row',
     alignItems: 'center',

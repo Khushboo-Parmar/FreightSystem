@@ -1,0 +1,108 @@
+
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Linking, Platform } from 'react-native';
+import Video from 'react-native-video';
+import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import Header from '../Header';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+const CustumerSupport = () => {
+  const handleContact = () => {
+    const url = Platform.OS === 'ios' ? 'mailto:support@bytegear.com' : 'mailto:support@bytegear.com';
+    Linking.openURL(url).catch(err => console.error('An error occurred', err));
+  };
+
+  const handleContactUs = () => {
+    const url = Platform.OS === 'ios' ? 'tel:+1234567890' : 'tel:+1234567890';
+    Linking.openURL(url).catch(err => console.error('An error occurred', err));
+  };
+
+  return (
+    <View style={styles.container}>
+      <Header />
+      <View style={styles.videoContainer}>
+        <Video
+          source={{ uri: "https://media.geeksforgeeks.org/wp-content/uploads/20210314115545/sample-video.mp4" }}
+          style={styles.video}
+          controls
+        />
+      </View>
+      <View style={styles.contactContainer}>
+        <Text style={styles.infoText}>Welcome to our support page! Here is a video that explains how to use our app effectively.
+          If you have any questions or need further assistance, please don't hesitate to reach out to us.For more help, contact us:</Text>
+        <View style={styles.contactContainer1}>
+          <TouchableOpacity onPress={handleContact} style={styles.contactButton}>
+            <Ionicons name="mail" size={20} color="white" />
+            <Text style={styles.contactText}>Email Us</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleContactUs} style={styles.contactButton}>
+            <Ionicons name="call" size={18} color="white" />
+            <Text style={styles.contactText}>Call Us</Text>
+          </TouchableOpacity>
+        </View>
+
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+
+  },
+  videoContainer: {
+    height: responsiveHeight(40),
+    width: responsiveWidth(100),
+    alignSelf: 'center',
+    marginBottom: responsiveHeight(2),
+    marginTop: responsiveHeight(2),
+    padding: responsiveWidth(2),
+    borderRadius: 10,
+    overflow: 'hidden',
+    shadowColor: 'red',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  video: {
+    flex: 1,
+    borderRadius: 10,
+  },
+  contactContainer: {
+    // alignItems: 'center',
+    padding: responsiveWidth(5),
+    justifyContent: 'center'
+  },
+  infoText: {
+    marginBottom: responsiveHeight(2),
+    color: 'black',
+    fontSize: responsiveFontSize(1.8),
+    fontWeight: '500',
+  },
+  contactButton: {
+    backgroundColor: '#ee1d23',
+    borderRadius: 10,
+    paddingVertical: responsiveHeight(2),
+    paddingHorizontal: responsiveWidth(4),
+    marginBottom: responsiveHeight(3),
+    alignSelf: 'center',
+    flexDirection: 'row',
+    gap: 3
+  },
+  contactText: {
+    color: 'white',
+    fontSize: responsiveFontSize(1.8),
+    textAlign: 'center',
+  },
+  contactContainer1: {
+    flexDirection: 'row',
+    justifyContent:'space-evenly',
+    alignItems: 'center',
+
+  }
+});
+
+export default CustumerSupport;

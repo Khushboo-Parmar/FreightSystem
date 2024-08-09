@@ -9,9 +9,6 @@
 // import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 // import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-// import SelectBox from 'react-native-multi-selectbox'
-// import { xorBy } from 'lodash'
-
 // const AddProduct = () => {
 
 //     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
@@ -24,30 +21,26 @@
 //     const [productList, setProductList] = useState([]);
 //     const [productPrice, setProductPrice] = useState(0);
 //     const [refreshing, setRefreshing] = useState(false);
-
-    
-//   const [selectedTeams, setSelectedTeams] = useState([])
 //     const formData = new FormData();
 
-//     const fetchProductList = useCallback(async () => {
-//         try {
-//             const response = await fetch(`${process.env.BASE_URL}productItem-list`);
-//             const data = await response.json();
-//             const products = data.map(item => ({
-//                 label: item.product_name,
-//                 value: item.id,
-//                 price: item.price
-//             }));
+//         const fetchProductList = useCallback(async () => {
+//             try {
+//                 const response = await fetch(`${process.env.BASE_URL}productItem-list`);
+//                 const data = await response.json();
+//                 const products = data.map(item => ({
+//                     label: item.product_name,
+//                     value: item.id,
+//                     price: item.price
+//                 }));
 
-//             setProductList(products);
-//             console.warn('productlist',productList)
-//         } catch (error) {
-//             console.error('Error fetching product list:', error.message);
-//         }
-//         finally {
-//             setRefreshing(false);
-//         }
-//     }, []);
+//                 setProductList(products);
+//             } catch (error) {
+//                 console.error('Error fetching product list:', error.message);
+//             }
+//             finally {
+//                 setRefreshing(false);
+//             }
+//         }, []);
 
 
 //     useEffect(() => {
@@ -76,8 +69,12 @@
 //     }, [selectedProduct, productList]);
 
 
+//     // useEffect(() => {
+//     //     const calculatedAmount = productPrice * (parseInt(totalBoxes) || 0);
+//     //     setTotalAmount(calculatedAmount.toFixed(2));
+//     // }, [productPrice, totalBoxes]);
 
-
+    
 
 //     const handleNext = () => {
 //         if (parseFloat(totalAmount) > 10000) {
@@ -100,24 +97,6 @@
 //         setRefreshing(true);
 //         fetchProductList();
 //     }, [fetchProductList]);
-//     function onMultiChange() {
-//         return (item) => setSelectedTeams(xorBy(selectedTeams, [item], 'id'))
-//       }
-
-
-//       const K_OPTIONS = [
-//         {
-//           item: 'Juventus',
-//           id: 'JUVE',
-//         },
-//         {
-//           item: 'Real Madrid',
-//           id: 'RM',
-//         },
-//         {
-//           item: 'Barcelona',
-//           id: 'BR',
-//         },]
 
 //     return (
 //         <View style={styles.container}>
@@ -129,35 +108,19 @@
 //                 <Text style={styles.title}>Product Details</Text>
 
 //             </View>
-
-
+        
+         
 //             <ScrollView contentContainerStyle={styles.scrollContainer}
-//                 refreshControl={
-//                     <RefreshControl
-//                         refreshing={refreshing}
-//                         onRefresh={onRefresh}
-//                     />
-//                 }
-//             >
-//                 <View style={styles.noteContainer}>
-//                     <Text style={styles.noteText}>To claim, the invoice amount must be greater than 10,000.</Text>
-//                 </View>
-
-//                 <View>
-//                 <Text style={{ fontSize: 20, paddingBottom: 10 }}>MultiSelect Demo</Text>
-//                 <SelectBox
-//                     label="Select multiple"
-//                     options={K_OPTIONS}
-//                     selectedValues={selectedTeams}
-//                     onMultiSelect={onMultiChange()}
-//                     onTapClose={onMultiChange()}
-//                     isMulti
+//             refreshControl={
+//                 <RefreshControl
+//                     refreshing={refreshing}
+//                     onRefresh={onRefresh}
 //                 />
-//         </View> 
-           
-// {/* 
-
-
+//             }
+//             >
+//             <View style={styles.noteContainer}>
+//                 <Text style={styles.noteText}>To claim, the invoice amount must be greater than 10,000.</Text>
+//             </View>
 //                 <View style={styles.inputContainer}>
 //                     <Icon name="cubes" size={20} color="#ee1d23" style={styles.icon} />
 //                     <Dropdown
@@ -174,13 +137,13 @@
 //                             setSelectedProduct(item.value);
 //                         }}
 //                     />
-//                 </View> */}
+//                 </View>
 
 //                 <View style={styles.inputContainer}>
 //                     <Icon name="dollar" size={20} color="#ee1d23" style={styles.icon} />
 //                     <TextInput
 //                         style={styles.input}
-//                         placeholder="Total number of boxes"
+//                         placeholder="TOTAL NO OF BOXES"
 //                         placeholderTextColor="grey"
 //                         keyboardType="numeric"
 //                         value={totalBoxes}
@@ -196,20 +159,19 @@
 //                         keyboardType="numeric"
 //                         value={totalAmount}
 //                         onChangeText={setTotalAmount}
-
-//                     // editable={false}
+//                         // editable={false}
 //                     />
 //                 </View>
 
-//                 <TouchableOpacity
+//                  <TouchableOpacity
 //                     style={[styles.submitButton, { opacity: parseFloat(totalAmount) > 10000 ? 1 : 0.5 }]}
 //                     onPress={handleNext}
 //                     disabled={parseFloat(totalAmount) <= 10000}
 //                 >
 //                     <Text style={styles.submitButtonText}>Next</Text>
 //                 </TouchableOpacity>
-//             </ScrollView >
-//         </View >
+//             </ScrollView>
+//         </View>
 //     );
 // }
 // const styles = StyleSheet.create({
@@ -322,15 +284,13 @@ import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
-import SelectBox from 'react-native-multi-selectbox';
-import { xorBy } from 'lodash';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Dropdown } from 'react-native-element-dropdown';
 const AddProduct = () => {
-    const phoneNumber = useSelector((state) => state.phone.phoneNumber);
+    // const phoneNumber = useSelector((state) => state.phone.phoneNumber);
     const user = useSelector((state) => state.user.user);
-    const userId = user.id;
+    // const userId = user.id;
     const navigation = useNavigation();
     const [totalBoxes, setTotalBoxes] = useState('');
     const [totalAmount, setTotalAmount] = useState(0);
@@ -342,12 +302,15 @@ const AddProduct = () => {
         try {
             const response = await fetch(`${process.env.BASE_URL}productItem-list`);
             const data = await response.json();
+            console.log('Fetched data:', data);
+    
             const products = data.map(item => ({
-                label: item.product_name,
-                value: item.id,
-                price: parseFloat(item.price) 
+                item: item.product_name ? item.product_name.toLowerCase() : '', 
+                id: item.id || '', 
+                price: parseFloat(item.price) || 0
             }));
-            setProductList(products);
+    
+            setProductList(products); 
         } catch (error) {
             console.error('Error fetching product list:', error.message);
         } finally {
@@ -359,20 +322,20 @@ const AddProduct = () => {
         fetchProductList();
     }, [fetchProductList]);
 
-    useEffect(() => {
-        const amount = selectedProducts.reduce((total, product) => {
-            const productDetails = productList.find(p => p.value === product.value);
-            return total + (productDetails ? productDetails.price : 0);
-        }, 0);
-        setTotalAmount(amount * parseFloat(totalBoxes || 0));
-    }, [selectedProducts, totalBoxes, productList]);
+    // useEffect(() => {
+    //     const amount = selectedProducts.reduce((total, product) => {
+    //         const productDetails = productList.find(p => p.value === product.value);
+    //         return total + (productDetails ? productDetails.price : 0);
+    //     }, 0);
+    //     setTotalAmount(amount * parseFloat(totalBoxes || 0));
+    // }, [selectedProducts, totalBoxes, productList]);
 
     const handleNext = () => {
         if (totalAmount > 10000) {
             navigation.navigate('ClaimForm', {
                 totalBoxes,
                 totalAmount,
-                selectedProducts
+                selectedProducts,
             });
         } else {
             Toast.show({
@@ -387,21 +350,7 @@ const AddProduct = () => {
         setRefreshing(true);
         fetchProductList();
     }, [fetchProductList]);
-
-      const K_OPTIONS = [
-        {
-          item: 'Juventus',
-          id: 'JUVE',
-        },
-        {
-          item: 'Real Madrid',
-          id: 'RM',
-        },
-        {
-          item: 'Barcelona',
-          id: 'BR',
-        },]
-
+    // console.warn(selectedProducts)
     return (
         <View style={styles.container}>
             <View style={{ display: 'flex', flexDirection: "row", alignItems: "center", justifyContent: 'flex-start', gap: responsiveWidth(22) }}>
@@ -419,16 +368,39 @@ const AddProduct = () => {
                 </View>
 
                 <View style={styles.inputContainer}>
-                <Icon name="cubes" size={20} color="#ee1d23" style={styles.icon} />
-                    <SelectBox
-                        label="Select product"
-                        options={K_OPTIONS}
-                        selectedValues={selectedProducts}
-                        onMultiSelect={(item) => setSelectedProducts(xorBy(selectedProducts, [item], 'value'))}
-                        onTapClose={(item) => setSelectedProducts(xorBy(selectedProducts, [item], 'value'))}
-                        isMulti
-                    />
-                </View>
+    {/* {/ <Icon name="cubes" size={20} color="#ee1d23" style={styles.icon} /> /} */}
+    {productList.length > 0 ? (
+<View style={{ marginBottom: responsiveHeight(1),width:'100%' }}>
+                        <Dropdown
+                            data={productList}
+                            inputSearchStyle={{color:'black'}}
+                            labelField="item"
+                            valueField="id"
+                            placeholder="Select a Product"
+                            search
+                            searchPlaceholder="Search by Product Name.."
+                            value={selectedProducts}
+                            onChange={(item) => setSelectedProducts(item.id)}
+                            style={{
+                                borderWidth: 1,
+                                borderRadius: 100,
+                                paddingHorizontal: responsiveWidth(6),
+                                color: 'black',
+                                height:responsiveHeight(7),
+                                marginVertical:responsiveHeight(3)
+                            }}
+                            itemTextStyle={{color:'black'}}
+                            placeholderStyle={{ color: 'grey' }}
+                            selectedTextStyle={{ color: 'black' }}
+                            containerStyle={{ paddingHorizontal: responsiveWidth(1) }}
+                        />
+                    </View>
+
+
+    ) : (
+        <Text>No products available</Text>
+    )}
+</View>
 
                 <View style={styles.inputContainer}>
                     <Icon name="cubes" size={20} color="#ee1d23" style={styles.icon} />
@@ -448,15 +420,16 @@ const AddProduct = () => {
                         style={styles.input}
                         placeholder="Total Amount"
                         placeholderTextColor="grey"
-                        value={totalAmount.toFixed(2)}
-                        editable={false}
+                        value={totalAmount}
+                        onChangeText={setTotalAmount}
+                        keyboardType='numeric'
                     />
                 </View>
 
                 <TouchableOpacity
-                    style={[styles.submitButton, { opacity: totalAmount > 10000 ? 1 : 0.5 }]}
+                    style={[styles.submitButton]}
                     onPress={handleNext}
-                    disabled={totalAmount <= 10000}
+                    // disabled={totalAmount <= 10000}
                 >
                     <Text style={styles.submitButtonText}>Next</Text>
                 </TouchableOpacity>
@@ -536,5 +509,4 @@ const styles = StyleSheet.create({
         color: 'black',
     },
 });
-
 export default AddProduct;

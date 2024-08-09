@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Alert } from 'react-native';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/FontAwesome';
 const OtpScreen = () => {
   const phoneNumber = useSelector(state => state.phone.phoneNumber);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-
+  const inputRefs = useRef([]);
   const verifyCode = async () => {
     setLoading(true);
     try {
@@ -53,23 +54,87 @@ const OtpScreen = () => {
     }
   };
 
+  const handleResend = async () => {
+    try {
+        const response = await fetch(`${process.env.BASE_URL}requestUser-otp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                phone: phoneNumber,
+            }),
+        });
+        const data = await response.json();
+        console.warn('Response data:', data);
+
+        if (response.status === 200) {
+            Toast.show({
+                type: 'success',
+                text1: 'OTP Resent',
+                text2: 'A new OTP has been sent to your phone.',
+            });
+        } else {
+            console.error('Resend OTP failed', data.message);
+            Toast.show({
+                type: 'error',
+                text1: 'Resend OTP Failed',
+                text2: data.message,
+            });
+        }
+    } catch (error) {
+        console.error('Error occurred during OTP resend', error);
+        Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'An error occurred while resending OTP. Please try again.',
+        });
+    }
+};
+const focusNextInput = (index) => {
+  if (index < 5) {
+      inputRefs.current[index + 1].focus();
+  }
+};
+
   return (
     <View style={styles.container}>
       <Image style={styles.logo} source={require('../../Images/logoWithoutbg.png')} />
       <Text style={styles.label}>Enter the OTP</Text>
       <Text style={styles.label2}>Enter the code sent to {phoneNumber}.</Text>
-      <Text style={styles.label3}>Didn't get code?</Text>
-      <TextInput
-        style={styles.input}
-        value={otp}
-        onChangeText={setOtp}
-        keyboardType="numeric"
-        placeholder="OTP"
-        placeholderTextColor="#999"
-      />
+      
+
+                <Text style={styles.label}>
+                    <Icon name="lock" size={20} color="#ee1d23" /> {' '} OTP :
+                </Text>
+
+                <View style={styles.otpContainer}>
+                    {[...Array(6)].map((_, i) => (
+                        <TextInput
+                            key={i}
+                            ref={(ref) => (inputRefs.current[i] = ref)}
+                            style={styles.otpInput}
+                            maxLength={1}
+                            keyboardType="numeric"
+                            onChangeText={(text) => {
+                                let otpText = otp.split('');
+                                otpText[i] = text;
+                                setOtp(otpText.join(''));
+                                if (text) focusNextInput(i);
+                            }}
+                            value={otp[i] || ''}
+                        />
+                    ))}
+                </View>
+       <TouchableOpacity onPress={handleResend}>
+       <Text style={styles.label3}>Didn't get code?</Text>
+                    <Text style={styles.buttonText2}>Resend OTP</Text>
+                </TouchableOpacity>
+
       {loading ? (
         <ActivityIndicator size="large" color="#ee1d23" />
       ) : (
+
         <TouchableOpacity onPress={verifyCode} style={styles.verifyBtn}>
           <Text style={styles.verifyBtnText}>Verify OTP</Text>
         </TouchableOpacity>
@@ -103,10 +168,11 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(1.8),
     textAlign: 'center',
     color: 'grey',
+    marginBottom:responsiveHeight(2),
   },
   label3: {
     fontSize: responsiveFontSize(1.8),
-    marginBottom: responsiveHeight(4),
+    marginBottom: responsiveHeight(1),
     textAlign: 'center',
     color: 'grey',
   },
@@ -136,6 +202,69 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: responsiveFontSize(2),
   },
+
+  buttonText: {
+    color: 'white',
+    fontSize: responsiveFontSize(2),
+    letterSpacing: 1.5
+},
+buttonText2: {
+    alignSelf: 'center',
+    color: 'red',
+    fontSize: responsiveFontSize(1.8)
+},
+bgImagelogin: {
+  height: responsiveHeight(30),
+  width: responsiveWidth(100),
+},
+bigHeading: {
+  fontSize: responsiveFontSize(2.5),
+  fontWeight: 'bold',
+  marginBottom: responsiveHeight(1),
+  color: 'black',
+  alignSelf: 'center',
+},
+smallPara: {
+  fontSize: responsiveFontSize(1.8),
+  color: '#666',
+  alignSelf: 'center',
+  marginBottom: responsiveHeight(2)
+},
+
+otpContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: responsiveHeight(2),
+},
+otpInput: {
+  height: responsiveHeight(6),
+  width: responsiveWidth(12),
+  borderColor: 'gray',
+  borderWidth: 1,
+  marginBottom: responsiveHeight(2),
+  padding: responsiveHeight(1.8),
+  borderRadius: 10,
+  backgroundColor: '#fff',
+  color: "black",
+  textAlign: 'center',
+  fontSize: responsiveFontSize(2),
+},
+spaceBetween: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: responsiveHeight(2),
+},
+smallHeading: {
+  fontSize: responsiveFontSize(2),
+  color: '#333',
+},
+button: {
+  backgroundColor: 'black',
+  padding: responsiveHeight(2.2),
+  borderRadius: 30,
+  alignItems: 'center',
+  marginTop: responsiveHeight(2),
+},
 });
 
 export default OtpScreen;

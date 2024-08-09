@@ -1,4 +1,4 @@
-import React, { useState, useRef  } from "react";
+import React, { useState, useRef } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -102,12 +102,11 @@ const Login = () => {
     };
 
 
- // Focus the next input field
- const focusNextInput = (index) => {
-    if (index < 5) {
-        inputRefs.current[index + 1].focus();
-    }
-};
+    const focusNextInput = (index) => {
+        if (index < 5) {
+            inputRefs.current[index + 1].focus();
+        }
+    };
 
 
     return (
@@ -186,7 +185,7 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderWidth: 1,
         marginBottom: responsiveHeight(2),
-        paddingLeft: responsiveHeight(3),
+        padding: responsiveHeight(1.8),
         borderRadius: 10,
         backgroundColor: '#fff',
         color: "black",

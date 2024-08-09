@@ -18,7 +18,8 @@ import AddProduct from './complain/claim/AddProduct';
 import GeneralTerms from './policies/GeneralTerms';
 import PrivacyPolicy from './policies/PrivacyPolicy';
 import DisclaimerPolicy from './policies/DisclaimerPolicy';
-import CameraTaking from './complain/claim/CameraTaking';
+import CustumerSupport from './policies/CustumerSupport';
+// import CameraTaking from './complain/claim/CameraTaking';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +55,7 @@ const AppNavigator = () => {
         <Stack.Screen name="GeneralTerms" component={GeneralTerms} options={{ headerShown: false }} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{ headerShown: false }} />
         <Stack.Screen name="DisclaimerPolicy" component={DisclaimerPolicy} options={{ headerShown: false }} />
+        <Stack.Screen name="CustumerSupport" component={CustumerSupport} options={{ headerShown: false }} />
       </Stack.Navigator>
 //  </NavigationContainer>
   );

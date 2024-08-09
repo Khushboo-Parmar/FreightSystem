@@ -3,14 +3,14 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Header from '../Header';
 
 const DisclaimerPolicy = () => {
   const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-
-
+      <Header />
       <ScrollView style={styles.content}>
         <Text style={styles.heading}>Disclaimer Policy</Text>
         <Text style={styles.text}>
@@ -28,29 +28,34 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    padding: responsiveWidth(5),
-
+  },
+  content: {
+    padding: responsiveWidth(5)
   },
   heading: {
-    fontSize: responsiveFontSize(2),
-    fontWeight: 'bold',
-    marginBottom: responsiveHeight(2),
-    color: 'red'
+    color: 'red',
+    lineHeight: responsiveHeight(2.4),
+    marginTop: responsiveHeight(2),
+    fontSize: responsiveFontSize(2.2),
+    fontWeight: '800',
   },
   text: {
-    fontSize: responsiveFontSize(1.8),
-    lineHeight: 22,
-    color: 'black',
-    textAlign:'justify'
+    lineHeight: responsiveHeight(2.4),
+    marginTop: responsiveHeight(2), 
+    fontSize: responsiveFontSize(1.4), 
+    fontWeight: '400', 
+    color: 'grey' ,
   },
   backButton: {
-    marginLeft: responsiveWidth(2),
+    marginLeft: responsiveWidth(4),
     width: responsiveWidth(10),
     backgroundColor: '#3c3c3c',
     height: responsiveHeight(5),
     borderRadius: 25,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom:responsiveHeight(3),
+    marginTop:responsiveHeight(3)
   },
   title: {
     fontSize: responsiveFontSize(2),

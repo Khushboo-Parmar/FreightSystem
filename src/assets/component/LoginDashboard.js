@@ -109,14 +109,14 @@ const LoginDashboard = () => {
             {user && (
                 <View style={styles.content}>
                     <View style={styles.header}>
-                        <View>
-                            <Text style={{ color: 'white', fontSize: responsiveFontSize(2.5), fontWeight: '600' }}>Bytegear</Text>
-                            <Text style={{ color: 'white', fontSize: responsiveFontSize(1.5), fontWeight: '500', marginLeft: responsiveWidth(8) }}>Freight App</Text>
-                            {/* <Image style={{}} source={require('../Images/smalll2.png')} /> */}
+                        <View style={styles.header2}>
+                            {/* <Text style={{ color: 'white', fontSize: responsiveFontSize(2.5), fontWeight: '600' }}>Bytegear</Text>
+                            <Text style={{ color: 'white', fontSize: responsiveFontSize(1.5), fontWeight: '500', marginLeft: responsiveWidth(8) }}>Freight App</Text> */}
+                           <Ionicons name="person-circle-outline" size={25} color="white" />
+                           <Text style={styles.greeting}>Hi, {user.full_name}</Text>
                         </View>
                         <View style={styles.header2}>
-                            <Ionicons name="person-circle-outline" size={25} color="white" />
-                            <Text style={styles.greeting}>Hi, {user.full_name}</Text>
+                       
                             <TouchableOpacity onPress={()=>{navigation.openDrawer()}}>
                                 <Ionicons name="menu-outline" size={25} color="white" />
                             </TouchableOpacity>
@@ -311,6 +311,5 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: responsiveWidth(2)
-
     }
 });

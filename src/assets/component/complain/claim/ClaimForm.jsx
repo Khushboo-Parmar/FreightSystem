@@ -724,21 +724,16 @@ const ClaimForm = (props) => {
     const route = useRoute();
     const [totalBoxes, setTotalBoxes] = useState(props?.route.params?.totalBoxes );
     const [totalAmount, setTotalAmount] = useState(props?.route.params);
-    // console.log('totalAmount from route ', route.params?.totalBoxes)
-    // console.warn('totalBoxes from route ', totalBoxes)
-    console.warn('product from route ',props?.route?.params?.totalAmount)
     const [selectedProduct, setSelectedProduct] = useState(props?.route.params?.selectedProduct);
     const [claimDetails, setClaimDetails] = useState('');
     const [selectedDate, setSelectedDate] = useState(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedDistributor, setSelectedDistributor] = useState('');
     const [invoiceNo, setInvoiceNo] = useState('');
-
     const [freightAmount, setFreightAmount] = useState('');
     const [invoiceFiles, setInvoiceFiles] = useState([]);
     const [transportFiles, setTransportFiles] = useState([]);
     const [distributorList, setDistributorList] = useState([]);
-
     const [productList, setProductList] = useState([]);
     const [productPrice, setProductPrice] = useState(0);
     const [refreshing, setRefreshing] = React.useState(false);
@@ -776,13 +771,8 @@ const ClaimForm = (props) => {
                 body: formData,
             });
 
-    
-            // console.warn('Response status:', response);
-            // console.warn('Response headers:', response.headers);
             const data = await response.json();
             
-            // console.log('Response data:', data);
-    
             if (data.status === 200) {
                 console.log('File uploaded successfully:', data.file_ids);
                 return data.file_ids;
@@ -806,7 +796,6 @@ const ClaimForm = (props) => {
         }
     };
     
-
     const handleFileSelection = async (type) => {
         try {
             const options = {

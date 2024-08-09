@@ -13,7 +13,7 @@ const PhoneNoScreen = () => {
   const dispatch = useDispatch();
   const sendVerificationCode = async () => {
     try {
-      const response = await fetch(`${process.env.BASE_URL}requestUser-otp`, {
+      const response = await fetch(`${process.env.BASE_URL}send-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,7 +32,15 @@ const PhoneNoScreen = () => {
           text1: 'Verification code sent successfully!',
         });
         navigation.navigate('OtpScreen');
-      } else {
+      }
+        else if (response.status === 400 && data.message === "Phone number already exists.") {
+          navigation.navigate('Loginphone');
+          Toast.show({
+            type: 'error',
+            text1: 'Phone number already exists',
+            text2: 'Go for login',
+          }); 
+      } else  {
        Toast.show({
         type: 'error',
         text1: 'Failed to send verification code',
@@ -54,17 +62,6 @@ const PhoneNoScreen = () => {
       <Image style={styles.logo} source={require('../../Images/logoWithoutbg.png')} />
       <Text style={styles.label}>Verify your phone number</Text>
       <Text style={styles.label2}>Please enter your mobile number to receive a verification code </Text>
-      {/* <View style={styles.inputContainer}>
-        <TextInput
-          // style={styles.phoneInput}
-          style={[styles.input, { backgroundColor: 'red' }]}
-          value={phoneNumberinput}
-          onChangeText={setPhoneNumberInput}
-          keyboardType="phone-pad"
-          placeholder="Phone Number"
-          placeholderTextColor="gray"
-        />
-      </View> */}
        <Text style={styles.labelphone}>
                     <Icon name="user" size={20} color="#ee1d23" /> {' '}Phone Number:
                 </Text>

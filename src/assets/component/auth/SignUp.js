@@ -9,6 +9,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker'; 
 import CaptchaV2Lib1 from './Recaptcha/Recaptcha';
+
 const SignUpForm = () => {
     const route = useRoute();
     const { userId } = route.params;
@@ -23,10 +24,8 @@ const SignUpForm = () => {
     const [email, setEmail] = useState('');
     const [state, setState] = useState('');
     const [stateList, setStateList] = useState([]);
-
     const [robot, setRobot] = useState(false);
-
-
+    
     const navigation = useNavigation();
 
     const handleFileUpload = async () => {
@@ -82,7 +81,6 @@ const SignUpForm = () => {
             return null;
         }
     };
-
     const handleSignUp = async () => {
         const uploadedFileId = await handleFileUpload();
         if (!uploadedFileId) return;

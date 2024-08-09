@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet, RefreshControl, ToastAndroid, Button } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet, RefreshControl, ToastAndroid } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -9,7 +9,6 @@ import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import FileSelectionModal from '../../Modal/CustumAlert';
 import Header from '../../Header';
 
 const ClaimForm = (props) => {
@@ -19,16 +18,16 @@ const ClaimForm = (props) => {
     const navigation = useNavigation();
 
     const route = useRoute();
-    const [modalVisible, setModalVisible] = useState(false);
-
     const [totalBoxes, setTotalBoxes] = useState(props?.route.params?.totalBoxes);
     const [totalAmount, setTotalAmount] = useState(props?.route.params);
+    console.warn('product from route ', props?.route?.params?.totalAmount)
     const [selectedProduct, setSelectedProduct] = useState(props?.route.params?.selectedProduct);
     const [claimDetails, setClaimDetails] = useState('');
     const [selectedDate, setSelectedDate] = useState(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedDistributor, setSelectedDistributor] = useState('');
     const [invoiceNo, setInvoiceNo] = useState('');
+
     const [freightAmount, setFreightAmount] = useState('');
     const [invoiceFiles, setInvoiceFiles] = useState([]);
     const [transportFiles, setTransportFiles] = useState([]);
@@ -52,14 +51,12 @@ const ClaimForm = (props) => {
             });
             return null;
         }
-
         const formData = new FormData();
         formData.append('files[]', {
             uri: file.uri,
             name: file.name,
             type: file.type,
         });
-
         try {
             const response = await fetch(`${process.env.BASE_URL}multi-file`, {
                 method: 'POST',
@@ -69,9 +66,7 @@ const ClaimForm = (props) => {
                 },
                 body: formData,
             });
-
             const data = await response.json();
-
             if (data.status === 200) {
                 console.log('File uploaded successfully:', data.file_ids);
                 return data.file_ids;
@@ -94,62 +89,57 @@ const ClaimForm = (props) => {
             return null;
         }
     };
-    const handleFileSelection = (type, file) => {
-        if (type === 'invoice') {
-            setInvoiceFiles(prevFiles => [...prevFiles, file]);
-        } else if (type === 'transport') {
-            setTransportFiles(prevFiles => [...prevFiles, file]);
+    const handleFileSelection = async (type) => {
+        try {
+            const options = {
+                mediaType: 'photo',
+                includeBase64: false,
+            };
+            const result = await new Promise((resolve, reject) => {
+                Alert.alert(
+                    'Select Image',
+                    'Choose an option',
+                    [
+                        { text: 'Camera', onPress: () => launchCamera(options, (response) => resolve(response)) },
+                        { text: 'Gallery', onPress: () => launchImageLibrary(options, (response) => resolve(response)) },
+                        { text: 'Cancel', onPress: () => reject('User cancelled'), style: 'cancel' }
+                    ],
+                    { cancelable: false }
+                );
+            });
+
+            if (result.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (result.errorCode) {
+                console.error('ImagePicker Error: ', result.errorMessage);
+            } else {
+                const selectedFile = {
+                    uri: result.assets[0].uri,
+                    name: result.assets[0].fileName,
+                    type: result.assets[0].type,
+                };
+
+                if (type === 'invoice') {
+                    setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
+                } else if (type === 'transport') {
+                    setTransportFiles(prevFiles => [...prevFiles, selectedFile]);
+                }
+            }
+        } catch (err) {
+            console.error('Error picking file:', err);
         }
     };
 
-    // const handleFileSelection = async (type) => {
-    //     try {
-    //         const options = {
-    //             mediaType: 'photo',
-    //             includeBase64: false,
-    //         };
-    //         const result = await new Promise((resolve, reject) => {
-    //             Alert.alert(
-    //                 'Select Image',
-    //                 'Choose an option',
-    //                 [
-    //                     { text: 'Camera', onPress: () => launchCamera(options, (response) => resolve(response)) },
-    //                     { text: 'Gallery', onPress: () => launchImageLibrary(options, (response) => resolve(response)) },
-    //                     { text: 'Cancel', onPress: () => reject('User cancelled'), style: 'cancel' }
-    //                 ],
-    //                 { cancelable: false }
-    //             );
-    //         });
-
-    //         if (result.didCancel) {
-    //             console.log('User cancelled image picker');
-    //         } else if (result.errorCode) {
-    //             console.error('ImagePicker Error: ', result.errorMessage);
-    //         } else {
-    //             const selectedFile = {
-    //                 uri: result.assets[0].uri,
-    //                 name: result.assets[0].fileName,
-    //                 type: result.assets[0].type,
-    //             };
-
-    //             if (type === 'invoice') {
-    //                 setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
-    //             } else if (type === 'transport') {
-    //                 setTransportFiles(prevFiles => [...prevFiles, selectedFile]);
-    //             }
-    //         }
-    //     } catch (err) {
-    //         console.error('Error picking file:', err);
-    //     }
-    // };
-
     const handleSubmitClaim = async () => {
+
         const uploadedInvoiceFileIds = await Promise.all(invoiceFiles.map(handleFileUpload));
         const uploadedTransportFileIds = await Promise.all(transportFiles.map(handleFileUpload));
+
         if (!selectedDate) {
             ToastAndroid.show('Date of purchase is required.', ToastAndroid.SHORT);
             return;
         }
+
         if (!selectedDistributor) {
             ToastAndroid.show('Distributor is required.', ToastAndroid.SHORT);
             console.log('Distributor is missing');
@@ -180,6 +170,9 @@ const ClaimForm = (props) => {
             ToastAndroid.show('Sorry, you cannot submit the claim form for purchases made more than 15 days ago.', ToastAndroid.SHORT);
             return;
         }
+        // console.log('Uploading files...');
+        // const uploadedInvoiceFileIds = await Promise.all(invoiceFiles.map(handleFileUpload));
+        // const uploadedTransportFileIds = await Promise.all(transportFiles.map(handleFileUpload));
 
         if (uploadedInvoiceFileIds.includes(null) || uploadedTransportFileIds.includes(null)) {
             return;
@@ -222,6 +215,7 @@ const ClaimForm = (props) => {
             });
 
             const data = await response.json();
+
             if (data.status === 200) {
                 Toast.show({
                     type: 'success',
@@ -288,12 +282,9 @@ const ClaimForm = (props) => {
         }, 2000);
     }, []);
     return (
-
         <View style={styles.container}>
-            <Header/>
-
+            <Header />
             <View style={styles.container1}>
-
                 <Text style={styles.heading}>Freight Claim Form</Text>
                 <ScrollView contentContainerStyle={styles.scrollContainer}
                     refreshControl={
@@ -332,7 +323,6 @@ const ClaimForm = (props) => {
                         />
                     </View>
 
-
                     <TouchableOpacity style={styles.productButtonstyle} onPress={() => navigation.navigate('AddProduct')}>
                         <Text style={styles.productBtntext}><Icon name="plus" size={15} color="white" />  ADD PRODUCT DETAIL</Text>
                     </TouchableOpacity>
@@ -347,8 +337,6 @@ const ClaimForm = (props) => {
                             onChangeText={setInvoiceNo}
                         />
                     </View>
-
-
                     <View style={styles.inputContainer}>
                         <Icon name="truck" size={20} color="#ee1d23" style={styles.icon} />
                         <TextInput
@@ -373,16 +361,70 @@ const ClaimForm = (props) => {
                             onChangeText={setClaimDetails}
                         />
                     </View>
-                    <View>
-                        <TouchableOpacity style={styles.fileButton} onPress={() => setModalVisible(true)}>
-                            <Text style={styles.fileButtonText}>Upload Invoice Images / Capture New</Text>
-                        </TouchableOpacity>
-                        <FileSelectionModal
-                            isVisible={modalVisible}
-                            onClose={() => setModalVisible(false)}
-                            onSelect={(file) => handleFileSelection('invoice', file)} // Replace 'invoice' with 'transport' as needed
-                        />
-                    </View>
+
+                    {/* <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
+                    <Text style={styles.fileButtonText}>Upload Invoice Images / capture New</Text>
+                </TouchableOpacity>
+
+                {invoiceFiles.map((file, index) => (
+                    <ScrollView horizontal style={styles.filePreviewContainer}>
+                        <View key={index} style={styles.filePreview}>
+                            {file.type === 'application/pdf' ? (
+                                <View style={styles.pdfContainer}>
+                                    <Icon name="file-pdf-o" size={50} color="red" />
+                                    <Text style={styles.fileText}>PDF: {file.name}</Text>
+                                    <TouchableOpacity style={styles.removeButtonpdf} onPress={() => removeFile('invoice', index)}>
+                                        <Icon name="times-circle" size={15} color="red" />
+                                    </TouchableOpacity>
+                                </View>
+                            ) : (
+                                <>
+                                    <Image
+                                        source={{ uri: file.uri }}
+                                        style={styles.uploadedImage}
+                                    />
+                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('invoice', index)}>
+                                        <Icon name="times-circle" size={15} color="red" />
+                                    </TouchableOpacity>
+                                </>
+                            )}
+
+                        </View>
+                    </ScrollView>
+                ))}
+
+                <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('transport')}>
+                    <Text style={styles.fileButtonText}>Upload Transport Receipt Images/ capture New</Text>
+                </TouchableOpacity>
+
+                {transportFiles.map((file, index) => (
+                    <ScrollView horizontal style={styles.filePreviewContainer}>
+                        <View key={index} style={styles.filePreview}>
+                            {file.type === 'application/pdf' ? (
+                                <View style={styles.pdfContainer}>
+                                    <Icon name="file-pdf-o" size={50} color="red" />
+                                    <Text style={styles.fileText}>PDF: {file.name}</Text>
+                                    <TouchableOpacity style={styles.removeButtonpdf} onPress={() => removeFile('transport', index)}>
+                                        <Icon name="times-circle" size={15} color="red" />
+                                    </TouchableOpacity>
+                                </View>
+                            ) : (
+                                <>
+                                    <Image
+                                        source={{ uri: file.uri }}
+                                        style={styles.uploadedImage}
+                                    />
+                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('transport', index)}>
+                                        <Icon name="times-circle" size={15} color="red" />
+                                    </TouchableOpacity>
+                                </>
+                            )}
+                        </View>
+                    </ScrollView>
+                ))} */}
+                    <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
+                        <Text style={styles.fileButtonText}>Upload Invoice Images / Capture New</Text>
+                    </TouchableOpacity>
 
                     {invoiceFiles.map((file, index) => (
                         <ScrollView horizontal key={index} style={styles.filePreviewContainer}>
@@ -398,15 +440,10 @@ const ClaimForm = (props) => {
                         </ScrollView>
                     ))}
 
-                    {/* <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('transport')}> */}
-                    <TouchableOpacity style={styles.fileButton} onPress={() => setModalVisible(true)}>
+                    <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('transport')}>
                         <Text style={styles.fileButtonText}>Upload Transport Receipt Images / Capture New</Text>
                     </TouchableOpacity>
-                    <FileSelectionModal
-                        isVisible={modalVisible}
-                        onClose={() => setModalVisible(false)}
-                        onSelect={(file) => handleFileSelection('transport', file)} // Replace 'invoice' with 'transport' as needed
-                    />
+
                     {transportFiles.map((file, index) => (
                         <ScrollView horizontal key={index} style={styles.filePreviewContainer}>
                             <View style={styles.filePreview}>
@@ -427,8 +464,10 @@ const ClaimForm = (props) => {
                 </ScrollView>
             </View>
         </View>
+
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

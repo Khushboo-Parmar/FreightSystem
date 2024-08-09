@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions,ToastAndroid } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
+
 const MyPieChart = () => {
     const [data, setData] = useState([
         {
@@ -69,11 +71,14 @@ const MyPieChart = () => {
                     ];
                     setData(newData);
                 } else {
-                    alert(result.message || 'Failed to fetch status counts');
+                    // alert(result.message || 'Failed to fetch status counts');
+                    ToastAndroid.show('Failed to fetch status counts', ToastAndroid.SHORT);
                 }
             } catch (error) {
                 console.error('Error fetching status counts:', error);
-                alert('An error occurred while fetching the status counts');
+                // alert('An error occurred while fetching the status counts');
+                ToastAndroid.show('An error occurred while fetching the status counts', ToastAndroid.SHORT);
+      
             }
         };
 

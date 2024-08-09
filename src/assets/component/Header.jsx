@@ -36,10 +36,7 @@ const Header = () => {
 export default Header;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white',
-    },
+
     bgImage: {
         height: responsiveHeight(8),
         width: responsiveWidth(10),

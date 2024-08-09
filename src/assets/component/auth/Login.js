@@ -39,8 +39,8 @@ const Login = () => {
 
                 Toast.show({
                     type: 'success',
-                    text1: 'Login Successful',
-                    text2: 'Welcome back! 👋',
+                    text1: 'Login Successful 🥳',
+                    text2: 'Welcome back!',
                 });
                 await AsyncStorage.setItem('token', token);
 

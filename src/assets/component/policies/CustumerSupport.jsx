@@ -5,8 +5,11 @@ import Video from 'react-native-video';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import Header from '../Header';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useNavigation } from '@react-navigation/native';
 const CustumerSupport = () => {
+  const navigation = useNavigation();
+
   const handleContact = () => {
     const url = Platform.OS === 'ios' ? 'mailto:support@bytegear.com' : 'mailto:support@bytegear.com';
     Linking.openURL(url).catch(err => console.error('An error occurred', err));
@@ -22,7 +25,8 @@ const CustumerSupport = () => {
       <Header />
       <View style={styles.videoContainer}>
         <Video
-          source={{ uri: "https://media.geeksforgeeks.org/wp-content/uploads/20210314115545/sample-video.mp4" }}
+        source={{ uri: "https://media.geeksforgeeks.org/wp-content/uploads/20210314115545/sample-video.mp4" }} 
+          // source={{ uri: "https://erp.genics.co.in/assets/uploads/videos/66b609d60c01f_1723206102.mp4" }}
           style={styles.video}
           controls
         />
@@ -42,6 +46,10 @@ const CustumerSupport = () => {
         </View>
 
       </View>
+
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -102,7 +110,19 @@ const styles = StyleSheet.create({
     justifyContent:'space-evenly',
     alignItems: 'center',
 
-  }
+  },
+  backButton: {
+    position: 'absolute',
+    bottom: responsiveHeight(5),
+    left: responsiveWidth(4),
+    width: responsiveWidth(10),
+    backgroundColor: '#3c3c3c',
+    height: responsiveHeight(5),
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
 });
 
 export default CustumerSupport;

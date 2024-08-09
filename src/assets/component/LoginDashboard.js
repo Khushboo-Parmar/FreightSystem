@@ -8,6 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyPieChart from './MyPieChart';
+import CustumAlert from './Modal/CustumAlert';
 
 const LoginDashboard = () => {
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
@@ -71,38 +72,15 @@ const LoginDashboard = () => {
                 setRefreshing(false);
             }
         };
-    //     fetchDashboardData();
-    // }, []);
+
     useEffect(() => {
         fetchDashboardData();
     }, []);
     
-    // const handleLogout = async () => {
-    //     try {
-    //         dispatch(clearUser());
-    //         Toast.show({
-    //             type: 'success',
-    //             text1: 'Logging out',
-    //             text2: 'Thank you!',
-    //         });
-    //         navigation.navigate('Dashboard');
-    //     } catch (error) {
-    //         console.error('Error during logout:', error);
-    //         Toast.show({
-    //             type: 'error',
-    //             text1: 'Error',
-    //             text2: 'Failed to logout. Please try again.',
-    //         });
-    //     }
-    // };
-
-
-
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         fetchDashboardData();
     }, []);
-
 
     return (
         <View style={styles.container}>
@@ -110,9 +88,7 @@ const LoginDashboard = () => {
                 <View style={styles.content}>
                     <View style={styles.header}>
                         <View style={styles.header2}>
-                            {/* <Text style={{ color: 'white', fontSize: responsiveFontSize(2.5), fontWeight: '600' }}>Bytegear</Text>
-                            <Text style={{ color: 'white', fontSize: responsiveFontSize(1.5), fontWeight: '500', marginLeft: responsiveWidth(8) }}>Freight App</Text> */}
-                           <Ionicons name="person-circle-outline" size={25} color="white" />
+                           <Ionicons name="person-circle-outline" size={30} color="white" />
                            <Text style={styles.greeting}>Hi, {user.full_name}</Text>
                         </View>
                         <View style={styles.header2}>
@@ -174,7 +150,6 @@ const LoginDashboard = () => {
 
                                 </View>
                             </View>
-
                             <View style={styles.card}>
                                 <Text style={styles.welcomeText}>We are pleased to help you</Text>
                                 <View style={styles.buttonView}>

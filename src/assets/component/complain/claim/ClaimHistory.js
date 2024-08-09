@@ -20,9 +20,10 @@ const ClaimHistory = () => {
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     
-    useEffect(() => {
+    // useEffect(() => {
         const fetchComplaints = async () => {
             setLoading(true);
+            setRefreshing(true);
             try {
                 const token = await AsyncStorage.getItem('token');
 
@@ -50,16 +51,23 @@ const ClaimHistory = () => {
                 setError(error.message);
             } finally {
                 setLoading(false);
+                setRefreshing(false);
             }
         };
 
+    //     if (userId) {
+    //         fetchComplaints();
+    //     } else {
+    //         setError("User ID not found");
+    //     }
+    // }, [userId]);
+    useEffect(() => {
         if (userId) {
             fetchComplaints();
         } else {
             setError("User ID not found");
         }
     }, [userId]);
-
     const renderTabBar = props => (
         <TabBar
             {...props}
@@ -70,7 +78,7 @@ const ClaimHistory = () => {
     );
     
     const onRefresh = useCallback(() => {
-        setRefreshing(true);
+        fetchComplaints();
     
     }, []);
 

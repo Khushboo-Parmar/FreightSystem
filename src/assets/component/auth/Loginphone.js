@@ -36,7 +36,7 @@ const Loginphone = () => {
                 navigation.navigate('Login');
                 Toast.show({
                     type: 'success',
-                    text1: 'Verification code sent successfully!',
+                    text1: 'Verification code sent successfully!💐',
                   });
             } else {
                 Toast.show({

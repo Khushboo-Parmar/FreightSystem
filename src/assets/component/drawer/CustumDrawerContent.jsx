@@ -34,7 +34,7 @@ const CustomDrawerContent = (props) => {
     { icon: 'file-document', label: 'Disclaimer Policy', navigateTo: 'DisclaimerPolicy' },
     { icon: 'home', label: 'General Terms', navigateTo: 'GeneralTerms' },
     { icon: 'lock', label: 'Privacy Policy', navigateTo: 'PrivacyPolicy' },
-    { icon: 'lock', label: 'Custumer Support', navigateTo: 'CustumerSupport' },
+    { icon: 'assistant', label: 'Custumer Support', navigateTo: 'CustumerSupport' },
     { icon: 'account', label: 'Profile', navigateTo: 'Profile' },
     { icon: 'logout', label: 'Logout', onPress: handleLogout },
   ];

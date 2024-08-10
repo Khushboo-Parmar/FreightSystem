@@ -117,7 +117,7 @@ const Login = () => {
                 <Text style={styles.smallPara}>Please Login</Text>
 
                 <Text style={styles.label}>
-                    <Icon name="lock" size={20} color="#ee1d23" /> {' '} OTP :
+                    <Icon name="lock" size={20} color="#ee1d23" /> {' '} OTP
                 </Text>
 
                 <View style={styles.otpContainer}>

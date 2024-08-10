@@ -167,7 +167,6 @@ const ClaimHistory = () => {
                     <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.title}>Claim History</Text>
-
             </View>
            {index === 1 && <FilterSelect />}
             {loading ? (

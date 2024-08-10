@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet, RefreshControl, ToastAndroid } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet, RefreshControl, ToastAndroid, Modal, Button} from 'react-native';
 import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -12,15 +12,23 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Header from '../../Header';
 
 const ClaimForm = (props) => {
+
+    const [randomCode, setRandomecode] = useState(Array.from({ length: 5 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.charAt(Math.floor(Math.random() * 36))).join(''));
+
+    console.warn(randomCode)
+
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
     const user = useSelector((state) => state.user.user);
     const userId = user.id;
     const navigation = useNavigation();
 
+    // const [isModalVisible, setModalVisible] = useState(false);
+    // const [selectedFileType, setSelectedFileType] = useState('');
+
+
     const route = useRoute();
     const [totalBoxes, setTotalBoxes] = useState(props?.route.params?.totalBoxes);
     const [totalAmount, setTotalAmount] = useState(props?.route.params);
-    console.warn('product from route ', props?.route?.params?.totalAmount)
     const [selectedProduct, setSelectedProduct] = useState(props?.route.params?.selectedProduct);
     const [claimDetails, setClaimDetails] = useState('');
     const [selectedDate, setSelectedDate] = useState(null);
@@ -32,6 +40,7 @@ const ClaimForm = (props) => {
     const [invoiceFiles, setInvoiceFiles] = useState([]);
     const [transportFiles, setTransportFiles] = useState([]);
     const [distributorList, setDistributorList] = useState([]);
+
     const [productList, setProductList] = useState([]);
     const [productPrice, setProductPrice] = useState(0);
     const [refreshing, setRefreshing] = React.useState(false);
@@ -51,12 +60,14 @@ const ClaimForm = (props) => {
             });
             return null;
         }
+
         const formData = new FormData();
         formData.append('files[]', {
             uri: file.uri,
             name: file.name,
             type: file.type,
         });
+
         try {
             const response = await fetch(`${process.env.BASE_URL}multi-file`, {
                 method: 'POST',
@@ -66,7 +77,9 @@ const ClaimForm = (props) => {
                 },
                 body: formData,
             });
+
             const data = await response.json();
+
             if (data.status === 200) {
                 console.log('File uploaded successfully:', data.file_ids);
                 return data.file_ids;
@@ -89,6 +102,51 @@ const ClaimForm = (props) => {
             return null;
         }
     };
+
+// modal start
+
+
+// const toggleModal = () => {
+//     setModalVisible(!isModalVisible);
+// };
+
+// const handleFileSelection = (type) => {
+//     setSelectedFileType(type);
+//     toggleModal();
+// };
+
+// const selectImage = async (source) => {
+//     const options = {
+//         mediaType: 'photo',
+//         includeBase64: false,
+//     };
+
+//     const response = source === 'camera' ? await launchCamera(options) : await launchImageLibrary(options);
+
+//     if (response.didCancel) {
+//         console.log('User cancelled image picker');
+//     } else if (response.errorCode) {
+//         console.error('ImagePicker Error: ', response.errorMessage);
+//     } else {
+//         const selectedFile = {
+//             uri: response.assets[0].uri,
+//             name: response.assets[0].fileName,
+//             type: response.assets[0].type,
+//         };
+//         if (selectedFileType === 'invoice') {
+//             setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
+//         } else if (selectedFileType === 'transport') {
+//             setTransportFiles(prevFiles => [...prevFiles, selectedFile]);
+//         }
+//     }
+
+//     toggleModal();
+// };
+// modal end
+
+
+
+
     const handleFileSelection = async (type) => {
         try {
             const options = {
@@ -118,7 +176,6 @@ const ClaimForm = (props) => {
                     name: result.assets[0].fileName,
                     type: result.assets[0].type,
                 };
-
                 if (type === 'invoice') {
                     setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
                 } else if (type === 'transport') {
@@ -129,7 +186,6 @@ const ClaimForm = (props) => {
             console.error('Error picking file:', err);
         }
     };
-
     const handleSubmitClaim = async () => {
 
         const uploadedInvoiceFileIds = await Promise.all(invoiceFiles.map(handleFileUpload));
@@ -162,7 +218,6 @@ const ClaimForm = (props) => {
             ToastAndroid.show('Invoice images are required.', ToastAndroid.SHORT);
             return;
         }
-
         const fifteenDaysAgo = new Date();
         fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
 
@@ -170,23 +225,20 @@ const ClaimForm = (props) => {
             ToastAndroid.show('Sorry, you cannot submit the claim form for purchases made more than 15 days ago.', ToastAndroid.SHORT);
             return;
         }
-        // console.log('Uploading files...');
-        // const uploadedInvoiceFileIds = await Promise.all(invoiceFiles.map(handleFileUpload));
-        // const uploadedTransportFileIds = await Promise.all(transportFiles.map(handleFileUpload));
 
         if (uploadedInvoiceFileIds.includes(null) || uploadedTransportFileIds.includes(null)) {
             return;
         }
+
         const formData = new FormData();
         formData.append('purchase_date', selectedDate ? selectedDate.toISOString().split('T')[0] : '');
         formData.append('distributor_id', selectedDistributor);
         formData.append('invoice_no', invoiceNo);
-        formData.append('total_boxes', totalBoxes);
-        formData.append('total_amount', props?.route?.params?.totalAmount);
         formData.append('freight_amount', freightAmount);
         formData.append('claim_details', claimDetails);
         formData.append('generated_by', userId);
         formData.append('product_id', selectedProduct);
+        formData.append('code', randomCode); 
 
         console.log('selectedProduct', selectedProduct)
 
@@ -215,12 +267,9 @@ const ClaimForm = (props) => {
             });
 
             const data = await response.json();
-
+console.log("data", data)
             if (data.status === 200) {
-                Toast.show({
-                    type: 'success',
-                    text1: 'Claim Submitted Successfully🤩',
-                });
+
                 setClaimDetails('');
                 setSelectedDate(null);
                 setSelectedDistributor('');
@@ -281,6 +330,7 @@ const ClaimForm = (props) => {
             setRefreshing(false);
         }, 2000);
     }, []);
+
     return (
         <View style={styles.container}>
             <Header />
@@ -323,7 +373,7 @@ const ClaimForm = (props) => {
                         />
                     </View>
 
-                    <TouchableOpacity style={styles.productButtonstyle} onPress={() => navigation.navigate('AddProduct')}>
+                    <TouchableOpacity style={styles.productButtonstyle} onPress={() => navigation.navigate('AddProduct' ,{code:randomCode})}>
                         <Text style={styles.productBtntext}><Icon name="plus" size={15} color="white" />  ADD PRODUCT DETAIL</Text>
                     </TouchableOpacity>
 
@@ -337,6 +387,7 @@ const ClaimForm = (props) => {
                             onChangeText={setInvoiceNo}
                         />
                     </View>
+
                     <View style={styles.inputContainer}>
                         <Icon name="truck" size={20} color="#ee1d23" style={styles.icon} />
                         <TextInput
@@ -362,66 +413,6 @@ const ClaimForm = (props) => {
                         />
                     </View>
 
-                    {/* <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
-                    <Text style={styles.fileButtonText}>Upload Invoice Images / capture New</Text>
-                </TouchableOpacity>
-
-                {invoiceFiles.map((file, index) => (
-                    <ScrollView horizontal style={styles.filePreviewContainer}>
-                        <View key={index} style={styles.filePreview}>
-                            {file.type === 'application/pdf' ? (
-                                <View style={styles.pdfContainer}>
-                                    <Icon name="file-pdf-o" size={50} color="red" />
-                                    <Text style={styles.fileText}>PDF: {file.name}</Text>
-                                    <TouchableOpacity style={styles.removeButtonpdf} onPress={() => removeFile('invoice', index)}>
-                                        <Icon name="times-circle" size={15} color="red" />
-                                    </TouchableOpacity>
-                                </View>
-                            ) : (
-                                <>
-                                    <Image
-                                        source={{ uri: file.uri }}
-                                        style={styles.uploadedImage}
-                                    />
-                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('invoice', index)}>
-                                        <Icon name="times-circle" size={15} color="red" />
-                                    </TouchableOpacity>
-                                </>
-                            )}
-
-                        </View>
-                    </ScrollView>
-                ))}
-
-                <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('transport')}>
-                    <Text style={styles.fileButtonText}>Upload Transport Receipt Images/ capture New</Text>
-                </TouchableOpacity>
-
-                {transportFiles.map((file, index) => (
-                    <ScrollView horizontal style={styles.filePreviewContainer}>
-                        <View key={index} style={styles.filePreview}>
-                            {file.type === 'application/pdf' ? (
-                                <View style={styles.pdfContainer}>
-                                    <Icon name="file-pdf-o" size={50} color="red" />
-                                    <Text style={styles.fileText}>PDF: {file.name}</Text>
-                                    <TouchableOpacity style={styles.removeButtonpdf} onPress={() => removeFile('transport', index)}>
-                                        <Icon name="times-circle" size={15} color="red" />
-                                    </TouchableOpacity>
-                                </View>
-                            ) : (
-                                <>
-                                    <Image
-                                        source={{ uri: file.uri }}
-                                        style={styles.uploadedImage}
-                                    />
-                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeFile('transport', index)}>
-                                        <Icon name="times-circle" size={15} color="red" />
-                                    </TouchableOpacity>
-                                </>
-                            )}
-                        </View>
-                    </ScrollView>
-                ))} */}
                     <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
                         <Text style={styles.fileButtonText}>Upload Invoice Images / Capture New</Text>
                     </TouchableOpacity>
@@ -462,17 +453,30 @@ const ClaimForm = (props) => {
                         <Text style={styles.submitButtonText}>Submit Claim</Text>
                     </TouchableOpacity>
                 </ScrollView>
+{/* modal start */}
+{/* <Modal
+                    visible={isModalVisible}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={toggleModal}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Select Image Source</Text>
+                            <Button title="Camera" onPress={() => selectImage('camera')} />
+                            <Button title="Gallery" onPress={() => selectImage('gallery')} />
+                            <Button title="Cancel" onPress={toggleModal} />
+                        </View>
+                    </View>
+                </Modal> */}
             </View>
         </View>
-
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-
     },
     container1: {
         flex: 1,
@@ -627,6 +631,24 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: responsiveFontSize(1.8),
         fontWeight: '400'
-    }
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+        width: '80%',
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: responsiveFontSize(2),
+        marginBottom: 15,
+    },
+
 });
 export default ClaimForm;

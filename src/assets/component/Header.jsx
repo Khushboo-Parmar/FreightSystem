@@ -52,7 +52,8 @@ const styles = StyleSheet.create({
     greeting: {
         fontSize: responsiveFontSize(1.8),
         fontWeight: 'bold',
-        color: 'black'
+        color: 'black',
+        letterSpacing:0.5
     },
     profilepic: {
         width: responsiveWidth(5),

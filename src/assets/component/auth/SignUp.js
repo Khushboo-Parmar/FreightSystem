@@ -433,7 +433,7 @@
 //     bgLogo:{
 //         height:responsiveHeight(25),
 //         width:responsiveWidth('100'),
-        
+
 //     }
 // });
 
@@ -831,7 +831,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-toast-message';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker'; 
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import CaptchaV2Lib1 from './Recaptcha/Recaptcha';
 const SignUpForm = () => {
     const route = useRoute();
@@ -859,7 +859,7 @@ const SignUpForm = () => {
             return null;
         }
 
-        if(!robot){
+        if (!robot) {
             ToastAndroid.show('Please Verify', ToastAndroid.SHORT);
 
             return null;
@@ -929,7 +929,8 @@ const SignUpForm = () => {
             console.log('data response', data)
             if (data.status === 200) {
                 console.log('Success:', data);
-            ToastAndroid.show('Sign up successful', ToastAndroid.SHORT);
+                ToastAndroid.show('Sign up successful', ToastAndroid.SHORT);
+
                 navigation.navigate('Loginphone');
             } else {
                 Toast.show({
@@ -937,7 +938,7 @@ const SignUpForm = () => {
                     text1: 'Sign up failed',
                     text2: data.message,
                 });
-            ToastAndroid.show(`${data?.message}`, ToastAndroid.SHORT);
+                ToastAndroid.show(`${data?.message}`, ToastAndroid.SHORT);
 
             }
         } catch (error) {
@@ -1043,7 +1044,7 @@ const SignUpForm = () => {
                         placeholderTextColor="grey"
                         value={partnerName}
                         onChangeText={setPartnerName}
-                        
+
                     />
                 </View>
                 <View style={styles.inputContainer}>
@@ -1106,22 +1107,22 @@ const SignUpForm = () => {
                     />
                 </View>
 
-                <TouchableOpacity style={styles.uploadButton}  onPress={handleFileSelection}>
+                <TouchableOpacity style={styles.uploadButton} onPress={handleFileSelection}>
                     <Text style={styles.uploadButtonText}>Upload Shop Images</Text>
                 </TouchableOpacity>
                 {file && (
                     <View style={styles.imageContainer}>
                         {file.type.includes('image') ? (
                             <>
-                            <Image
-                                source={{ uri: file.uri }}
-                                style={styles.uploadedImage}
-                                resizeMode="cover"
-                            />
-                            <TouchableOpacity style={styles.removeButton} onPress={removeFile}>
+                                <Image
+                                    source={{ uri: file.uri }}
+                                    style={styles.uploadedImage}
+                                    resizeMode="cover"
+                                />
+                                <TouchableOpacity style={styles.removeButton} onPress={removeFile}>
                                     <Icon name="times-circle" size={15} color="red" />
                                 </TouchableOpacity>
-                                </>
+                            </>
                         ) : (
                             <View style={styles.pdfContainer}>
                                 <Icon name="file-pdf-o" size={50} color="red" />
@@ -1133,7 +1134,7 @@ const SignUpForm = () => {
                         )}
                     </View>
                 )}
-    <CaptchaV2Lib1 setRobot={setRobot} />
+                <CaptchaV2Lib1 setRobot={setRobot} />
                 <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
                     <Text style={styles.signupButtonText}>Sign Up</Text>
                 </TouchableOpacity>
@@ -1170,7 +1171,7 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
         fontSize: responsiveFontSize(1.8),
         color: 'black',
-        textTransform:'uppercase'
+        textTransform: 'uppercase'
     },
     inputemail: {
         flex: 1,
@@ -1209,13 +1210,13 @@ const styles = StyleSheet.create({
         marginRight: responsiveWidth(2),
         borderWidth: 1,
         borderColor: '#ccc',
-        position:'relative',
+        position: 'relative',
     },
     pdfContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent:'flex-start',
-        gap:responsiveWidth(2),
+        justifyContent: 'flex-start',
+        gap: responsiveWidth(2),
 
     },
     pdfText: {
@@ -1235,12 +1236,12 @@ const styles = StyleSheet.create({
         fontSize: responsiveFontSize(2),
         textAlign: 'center',
     },
-    itemTextStyle:{
-        color:'black'
+    itemTextStyle: {
+        color: 'black'
     },
     removeButton: {
         position: 'absolute',
-        top:responsiveHeight(0.5),
+        top: responsiveHeight(0.5),
         left: responsiveWidth(14),
         backgroundColor: 'rgba(255,255,255,0.7)',
         borderRadius: 10,
@@ -1257,16 +1258,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    placeholderStyle:{
-        color:'grey'
+    placeholderStyle: {
+        color: 'grey'
     },
     selectedTextStyle: {
         color: 'black',
     },
-    bgLogo:{
-        height:responsiveHeight(25),
-        width:responsiveWidth('100'),
-        
+    bgLogo: {
+        height: responsiveHeight(25),
+        width: responsiveWidth('100'),
+
     }
 });
 

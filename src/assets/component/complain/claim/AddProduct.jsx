@@ -64,7 +64,7 @@ const AddProduct = (props) => {
         ToastAndroid.show(`${result?.status === 401 ? 'Please Fill All Fields' : result?.message}`, ToastAndroid.SHORT);
     };
     const fetchItems = async () => {
-        const response = await fetch('https://erp.genics.co.in/api/get-products', {
+        const response = await fetch(`${process.env.BASE_URL}get-products`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${user}`,
@@ -78,7 +78,7 @@ const AddProduct = (props) => {
         setData(result?.data);
     };
     const handleDelete = async (id, price) => {
-        const response = await fetch('https://erp.genics.co.in/api/delete-product', {
+        const response = await fetch(`${process.env.BASE_URL}delete-product`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${user}`,

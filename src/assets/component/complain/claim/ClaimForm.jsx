@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet, RefreshControl, ToastAndroid, Modal, Button} from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image, Alert, StyleSheet, RefreshControl, ToastAndroid, Modal, Button } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -22,8 +22,8 @@ const ClaimForm = (props) => {
     const userId = user.id;
     const navigation = useNavigation();
 
-    // const [isModalVisible, setModalVisible] = useState(false);
-    // const [selectedFileType, setSelectedFileType] = useState('');
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [selectedFileType, setSelectedFileType] = useState('');
 
 
     const route = useRoute();
@@ -103,89 +103,89 @@ const ClaimForm = (props) => {
         }
     };
 
-// modal start
+    // modal start
 
 
-// const toggleModal = () => {
-//     setModalVisible(!isModalVisible);
-// };
-
-// const handleFileSelection = (type) => {
-//     setSelectedFileType(type);
-//     toggleModal();
-// };
-
-// const selectImage = async (source) => {
-//     const options = {
-//         mediaType: 'photo',
-//         includeBase64: false,
-//     };
-
-//     const response = source === 'camera' ? await launchCamera(options) : await launchImageLibrary(options);
-
-//     if (response.didCancel) {
-//         console.log('User cancelled image picker');
-//     } else if (response.errorCode) {
-//         console.error('ImagePicker Error: ', response.errorMessage);
-//     } else {
-//         const selectedFile = {
-//             uri: response.assets[0].uri,
-//             name: response.assets[0].fileName,
-//             type: response.assets[0].type,
-//         };
-//         if (selectedFileType === 'invoice') {
-//             setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
-//         } else if (selectedFileType === 'transport') {
-//             setTransportFiles(prevFiles => [...prevFiles, selectedFile]);
-//         }
-//     }
-
-//     toggleModal();
-// };
-// modal end
-
-
-
-
-    const handleFileSelection = async (type) => {
-        try {
-            const options = {
-                mediaType: 'photo',
-                includeBase64: false,
-            };
-            const result = await new Promise((resolve, reject) => {
-                Alert.alert(
-                    'Select Image',
-                    'Choose an option',
-                    [
-                        { text: 'Camera', onPress: () => launchCamera(options, (response) => resolve(response)) },
-                        { text: 'Gallery', onPress: () => launchImageLibrary(options, (response) => resolve(response)) },
-                        { text: 'Cancel', onPress: () => reject('User cancelled'), style: 'cancel' }
-                    ],
-                    { cancelable: false }
-                );
-            });
-
-            if (result.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (result.errorCode) {
-                console.error('ImagePicker Error: ', result.errorMessage);
-            } else {
-                const selectedFile = {
-                    uri: result.assets[0].uri,
-                    name: result.assets[0].fileName,
-                    type: result.assets[0].type,
-                };
-                if (type === 'invoice') {
-                    setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
-                } else if (type === 'transport') {
-                    setTransportFiles(prevFiles => [...prevFiles, selectedFile]);
-                }
-            }
-        } catch (err) {
-            console.error('Error picking file:', err);
-        }
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
     };
+
+    const handleFileSelection = (type) => {
+        setSelectedFileType(type);
+        toggleModal();
+    };
+
+    const selectImage = async (source) => {
+        const options = {
+            mediaType: 'photo',
+            includeBase64: false,
+        };
+
+        const response = source === 'camera' ? await launchCamera(options) : await launchImageLibrary(options);
+
+        if (response.didCancel) {
+            console.log('User cancelled image picker');
+        } else if (response.errorCode) {
+            console.error('ImagePicker Error: ', response.errorMessage);
+        } else {
+            const selectedFile = {
+                uri: response.assets[0].uri,
+                name: response.assets[0].fileName,
+                type: response.assets[0].type,
+            };
+            if (selectedFileType === 'invoice') {
+                setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
+            } else if (selectedFileType === 'transport') {
+                setTransportFiles(prevFiles => [...prevFiles, selectedFile]);
+            }
+        }
+
+        toggleModal();
+    };
+    // modal end
+
+
+
+
+    // const handleFileSelection = async (type) => {
+    //     try {
+    //         const options = {
+    //             mediaType: 'photo',
+    //             includeBase64: false,
+    //         };
+    //         const result = await new Promise((resolve, reject) => {
+    //             Alert.alert(
+    //                 'Select Image',
+    //                 'Choose an option',
+    //                 [
+    //                     { text: 'Camera', onPress: () => launchCamera(options, (response) => resolve(response)) },
+    //                     { text: 'Gallery', onPress: () => launchImageLibrary(options, (response) => resolve(response)) },
+    //                     { text: 'Cancel', onPress: () => reject('User cancelled'), style: 'cancel' }
+    //                 ],
+    //                 { cancelable: false }
+    //             );
+    //         });
+
+    //         if (result.didCancel) {
+    //             console.log('User cancelled image picker');
+    //         } else if (result.errorCode) {
+    //             console.error('ImagePicker Error: ', result.errorMessage);
+    //         } else {
+    //             const selectedFile = {
+    //                 uri: result.assets[0].uri,
+    //                 name: result.assets[0].fileName,
+    //                 type: result.assets[0].type,
+    //             };
+    //             if (type === 'invoice') {
+    //                 setInvoiceFiles(prevFiles => [...prevFiles, selectedFile]);
+    //             } else if (type === 'transport') {
+    //                 setTransportFiles(prevFiles => [...prevFiles, selectedFile]);
+    //             }
+    //         }
+    //     } catch (err) {
+    //         console.error('Error picking file:', err);
+    //     }
+    // };
     const handleSubmitClaim = async () => {
 
         const uploadedInvoiceFileIds = await Promise.all(invoiceFiles.map(handleFileUpload));
@@ -238,7 +238,7 @@ const ClaimForm = (props) => {
         formData.append('claim_details', claimDetails);
         formData.append('generated_by', userId);
         formData.append('product_id', selectedProduct);
-        formData.append('code', randomCode); 
+        formData.append('code', randomCode);
 
         console.log('selectedProduct', selectedProduct)
 
@@ -267,9 +267,12 @@ const ClaimForm = (props) => {
             });
 
             const data = await response.json();
-console.log("data", data)
+            console.log("data", data)
             if (data.status === 200) {
-
+                Toast.show({
+                    type: 'success',
+                    text1: 'Claim Successful 🥳',
+                });
                 setClaimDetails('');
                 setSelectedDate(null);
                 setSelectedDistributor('');
@@ -373,7 +376,7 @@ console.log("data", data)
                         />
                     </View>
 
-                    <TouchableOpacity style={styles.productButtonstyle} onPress={() => navigation.navigate('AddProduct' ,{code:randomCode})}>
+                    <TouchableOpacity style={styles.productButtonstyle} onPress={() => navigation.navigate('AddProduct', { code: randomCode })}>
                         <Text style={styles.productBtntext}><Icon name="plus" size={15} color="white" />  ADD PRODUCT DETAIL</Text>
                     </TouchableOpacity>
 
@@ -453,8 +456,8 @@ console.log("data", data)
                         <Text style={styles.submitButtonText}>Submit Claim</Text>
                     </TouchableOpacity>
                 </ScrollView>
-{/* modal start */}
-{/* <Modal
+                {/* modal start */}
+                <Modal
                     visible={isModalVisible}
                     transparent={true}
                     animationType="slide"
@@ -462,13 +465,25 @@ console.log("data", data)
                 >
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>Select Image Source</Text>
+                            {/* <Text style={styles.modalTitle}>Select Image Source</Text>
                             <Button title="Camera" onPress={() => selectImage('camera')} />
                             <Button title="Gallery" onPress={() => selectImage('gallery')} />
-                            <Button title="Cancel" onPress={toggleModal} />
+                            <Button title="Cancel" onPress={toggleModal} /> */}
+
+                            <Text style={styles.title}>Select Image</Text>
+                            <TouchableOpacity style={styles.button} onPress={() => selectImage('camera')}>
+                                <Text style={styles.buttonText}>Take Photo</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.button} onPress={() => selectImage('gallery')}>
+                                <Text style={styles.buttonText}>Choose from Gallery</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.button} onPress={toggleModal} >
+                                <Text style={styles.buttonText}>Cancel</Text>
+                            </TouchableOpacity>
+
                         </View>
                     </View>
-                </Modal> */}
+                </Modal>
             </View>
         </View>
     );
@@ -637,17 +652,40 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.5)',
+
     },
     modalContent: {
-        width: '80%',
-        padding: 20,
         backgroundColor: 'white',
-        borderRadius: 10,
+        paddingVertical: responsiveHeight(2),
+        paddingHorizontal: responsiveWidth(5),
+        borderRadius: 20,
+        width: responsiveWidth(80),
         alignItems: 'center',
     },
     modalTitle: {
         fontSize: responsiveFontSize(2),
         marginBottom: 15,
+    },
+    title: {
+        fontSize: responsiveFontSize(2),
+        marginBottom: responsiveHeight(2),
+        color:'black',
+        fontWeight:"700"
+    
+    },
+    button: {
+        paddingVertical: responsiveHeight(1.5),
+        paddingHorizontal: responsiveWidth(5),
+        backgroundColor: '#ee1d23',
+        borderRadius: 20,
+        marginVertical: responsiveHeight(1),
+        width: '100%',
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: responsiveFontSize(2),
+        fontWeight:"600"
     },
 
 });

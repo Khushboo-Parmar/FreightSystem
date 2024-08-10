@@ -28,7 +28,6 @@ const Login = () => {
                     otp
                 })
             });
-
             const data = await response.json();
             console.warn('login data', data);
 
@@ -45,6 +44,16 @@ const Login = () => {
                 await AsyncStorage.setItem('token', token);
 
                 navigation.navigate('LoginDashboard');
+
+            } else if (response.status === 400) {
+                console.error('Bad request', data.message);
+                Toast.show({
+                    type: 'error',
+                    text1: 'Bad Request',
+                    text2: data.message,
+                });
+                navigation.navigate('SignUp');
+
             } else {
                 console.error('Login failed', data.message);
                 Toast.show({

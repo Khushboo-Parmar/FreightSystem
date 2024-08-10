@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
     },
     fileButtonText: {
         color: '#ee1d23',
-        fontSize: responsiveFontSize(1.6),
+        fontSize: responsiveFontSize(1.8),
         textAlign: 'center',
     },
     filePreview: {

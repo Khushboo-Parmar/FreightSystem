@@ -60,7 +60,8 @@ const PhoneNoScreen = () => {
   return (
     <View style={styles.container}>
       <Image style={styles.logo} source={require('../../Images/logoWithoutbg.png')} />
-      <Text style={styles.label}>Verify your phone number</Text>
+      {/* <Text style={styles.label}>Verify your phone number</Text> */}
+      <Text style={styles.label}>Register your phone number</Text>
       <Text style={styles.label2}>Please enter your mobile number to receive a verification code </Text>
        <Text style={styles.labelphone}>
                     <Icon name="user" size={20} color="#ee1d23" /> {' '}Phone Number:

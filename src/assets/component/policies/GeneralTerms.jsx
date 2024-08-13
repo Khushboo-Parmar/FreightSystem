@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     padding: responsiveWidth(5)
   },
   heading: {
-    color: 'red',
+    color: 'black',
     lineHeight: responsiveHeight(2.4),
     marginTop: responsiveHeight(2),
     fontSize: responsiveFontSize(2.2),

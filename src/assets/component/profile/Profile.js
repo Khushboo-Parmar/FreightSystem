@@ -18,12 +18,12 @@ const Profile = () => {
 
             {user && (
                 <>
-                    <View style={styles.curve}>
+                    {/* <View style={styles.curve}> */}
                         <Image
                             style={styles.profilepic}
                             source={{ uri: user?.file }}
                         />
-                    </View>
+                    {/* </View> */}
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                         <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
                     </TouchableOpacity>
@@ -122,17 +122,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#fff',
-        borderRadius: 10,
+        // borderRadius: 10,
         padding: responsiveHeight(2),
         marginBottom: responsiveHeight(1.5),
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
+        // shadowColor: "#000",
+        // shadowOffset: {
+        //     width: 0,
+        //     height: 2,
+        // },
+        // shadowOpacity: 0.1,
+        // shadowRadius: 3.84,
+        // elevation: 5,
     },
     infoIcon: {
         marginRight: responsiveWidth(5),

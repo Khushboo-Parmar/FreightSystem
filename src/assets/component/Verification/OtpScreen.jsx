@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const OtpScreen = () => {
   const phoneNumber = useSelector(state => state.phone.phoneNumber);
   const [otp, setOtp] = useState('');
@@ -37,6 +38,8 @@ const OtpScreen = () => {
         navigation.navigate('SignUp', { token: data.token , userId: data.data.id});
         
       } else {
+        setOtp('');
+        inputRefs.current.forEach(ref => ref.clear());
         Toast.show({
           type: 'error',
           text1: 'Failed to verify code',
@@ -46,6 +49,8 @@ const OtpScreen = () => {
     } catch (error) {
       setLoading(false);
       console.error('Error verifying code:', error);
+      setOtp('');
+      inputRefs.current.forEach(ref => ref.clear());
       Toast.show({
         type: 'error',
         text1: 'Failed to verify code',
@@ -99,13 +104,16 @@ const focusNextInput = (index) => {
 
   return (
     <View style={styles.container}>
+                  <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <FontAwesome name="chevron-left" size={responsiveFontSize(2)} color="black" />
+      </TouchableOpacity>
       <Image style={styles.logo} source={require('../../Images/logoWithoutbg.png')} />
       <Text style={styles.label}>Enter the OTP</Text>
       <Text style={styles.label2}>Enter the code sent to {phoneNumber}.</Text>
       
 
                 <Text style={styles.label}>
-                    <Icon name="lock" size={20} color="#ee1d23" /> {' '} OTP :
+                    <Icon name="lock" size={20} color="#ee1d23" /> {' '} OTP
                 </Text>
 
                 <View style={styles.otpContainer}>
@@ -264,6 +272,17 @@ button: {
   borderRadius: 30,
   alignItems: 'center',
   marginTop: responsiveHeight(2),
+},
+backButton: {
+  marginLeft: responsiveWidth(1),
+  width: responsiveWidth(10),
+  height: responsiveHeight(5),
+  borderRadius: 25,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom:responsiveHeight(3),
+  position:'absolute',
+  top:10
 },
 });
 

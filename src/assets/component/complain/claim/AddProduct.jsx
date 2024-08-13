@@ -264,6 +264,7 @@ const styles = StyleSheet.create({
         height: responsiveHeight(6),
         fontSize: responsiveFontSize(2),
         color: '#333',
+        textTransform: 'uppercase'
     },
     submitButton: {
         backgroundColor: '#ee1d23',

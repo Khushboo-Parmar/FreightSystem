@@ -27,7 +27,7 @@ const LoginDashboard = () => {
 
     useEffect(() => {
         if (!user) {
-            navigation.navigate('LoginPhone');
+            navigation.navigate('Loginphone');
         }
     }, [user, navigation]);
 
@@ -196,7 +196,8 @@ const styles = StyleSheet.create({
     greeting: {
         fontSize: responsiveFontSize(1.8),
         fontWeight: 'bold',
-        color: 'black'
+        color: 'white',
+        letterSpacing:0.5,
     },
     profilepic: {
         width: responsiveWidth(5),

@@ -59,11 +59,11 @@ const Loginphone = () => {
         <View style={s.containerWhite}>
             <Image style={styles.bgImagelogin} source={require('../../Images/logo.png')} />
             <View style={s.container}>
-                <Text style={styles.bigHeading}>WELCOME BACK!</Text>
+                <Text style={styles.bigHeading}>WELCOME BACK</Text>
 
                 <Text style={styles.smallPara}>Please enter your phone number for login</Text>
                 <Text style={styles.label}>
-                    <Icon name="user" size={20} color="#ee1d23" /> {' '}Phone Number:
+                    <Icon name="user" size={20} color="#ee1d23" /> {' '}Phone Number
                 </Text>
                 <TextInput
                     style={styles.input}

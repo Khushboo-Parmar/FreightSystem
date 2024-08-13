@@ -30,14 +30,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: responsiveWidth(5)
+    padding: responsiveWidth(5),
   },
   heading: {
-    color: 'red',
+    color: 'black',
     lineHeight: responsiveHeight(2.4),
     marginTop: responsiveHeight(2),
     fontSize: responsiveFontSize(2.2),
-    fontWeight: '800',
+    fontWeight: '800'
   },
   text: {
     lineHeight: responsiveHeight(2.4),

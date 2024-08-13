@@ -243,8 +243,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3,
         elevation: 5,
-        marginBottom: responsiveHeight(1),
-        marginTop: responsiveHeight(4),
+        marginBottom: responsiveHeight(0.5),
+        marginTop: responsiveHeight(3),
     },
     cardContent: {
         flexDirection: 'row',
@@ -257,7 +257,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         resizeMode: 'contain',
     },
-
     textContainer: {
         marginLeft: responsiveWidth(4),
         flex: 1,

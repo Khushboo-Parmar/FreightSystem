@@ -17,7 +17,7 @@ const PrivacyPolicy = () => {
           <Text style={{ lineHeight: responsiveHeight(2.4), marginTop: responsiveHeight(2), fontSize: responsiveFontSize(2.2), fontWeight: '800', color: 'black'}}>PRIVACY POLICY</Text>
         </View>
         <Text style={{ lineHeight: responsiveHeight(2.4), marginTop: responsiveHeight(2), fontSize: responsiveFontSize(1.4), fontWeight: '400', color: 'grey' }}>
-          PRIVACY POLICY
+          Privacy Policy
           We Are Committed To Protecting Your Privacy. We Will Only Use The Information That We Collect About You Lawfully.
           We Collect Information About You For 2 Reasons: Firstly, To Process Your Order And Second, To Provide You With The Best Possible Service.
           We Will Give You The Chance To Refuse Any Marketing Email From Us.
@@ -48,10 +48,11 @@ const styles = StyleSheet.create({
   },
 
   heading: {
-    fontSize: responsiveFontSize(2),
-    fontWeight: 'bold',
-    marginBottom: responsiveHeight(2),
-    color: 'red'
+    color: 'black',
+    lineHeight: responsiveHeight(2.4),
+    marginTop: responsiveHeight(2),
+    fontSize: responsiveFontSize(2.2),
+    fontWeight: '800'
   },
   text: {
     fontSize: responsiveFontSize(1.8),

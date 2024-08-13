@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPhoneNumber } from '../../../reduxFeatures/content/phoneSlice';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 const PhoneNoScreen = () => {
   const navigation = useNavigation();
@@ -33,19 +34,19 @@ const PhoneNoScreen = () => {
         });
         navigation.navigate('OtpScreen');
       }
-        else if (response.status === 400 && data.message === "Phone number already exists.") {
-          navigation.navigate('Loginphone');
-          Toast.show({
-            type: 'error',
-            text1: 'Phone number already exists',
-            text2: 'Go for login',
-          }); 
-      } else  {
-       Toast.show({
-        type: 'error',
-        text1: 'Failed to send verification code',
-        text2: 'Please try again.',
-      });
+      else if (response.status === 400 && data.message === "Phone number already exists.") {
+        navigation.navigate('Loginphone');
+        Toast.show({
+          type: 'error',
+          text1: 'Phone number already exists',
+          text2: 'Go for login',
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Failed to send verification code',
+          text2: 'Please try again.',
+        });
       }
     } catch (error) {
       console.error('Error sending verification code:', error);
@@ -59,21 +60,25 @@ const PhoneNoScreen = () => {
 
   return (
     <View style={styles.container}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        {/* <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="black" /> */}
+        <FontAwesome name="chevron-left" size={responsiveFontSize(2)} color="black" />
+      </TouchableOpacity>
       <Image style={styles.logo} source={require('../../Images/logoWithoutbg.png')} />
       {/* <Text style={styles.label}>Verify your phone number</Text> */}
       <Text style={styles.label}>Register your phone number</Text>
       <Text style={styles.label2}>Please enter your mobile number to receive a verification code </Text>
-       <Text style={styles.labelphone}>
-                    <Icon name="user" size={20} color="#ee1d23" /> {' '}Phone Number:
-                </Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter your phone number"
-                    placeholderTextColor="#aaa"
-                    onChangeText={setPhoneNumberInput}
-                    value={phoneNumberinput}
-                    autoCapitalize="none"
-                />
+      <Text style={styles.labelphone}>
+        <Icon name="user" size={20} color="#ee1d23" /> {' '}Phone Number:
+      </Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter your phone number"
+        placeholderTextColor="#aaa"
+        onChangeText={setPhoneNumberInput}
+        value={phoneNumberinput}
+        autoCapitalize="none"
+      />
       <TouchableOpacity onPress={sendVerificationCode} style={styles.sendBtn}>
         <Icon name="send" size={20} color="#fff" />
         <Text style={styles.sendBtnText}>SEND OTP</Text>
@@ -106,8 +111,8 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(2),
     marginBottom: responsiveHeight(1),
     color: 'black',
-    fontWeight:"600"
-},
+    fontWeight: "600"
+  },
   label2: {
     fontSize: responsiveFontSize(1.8),
     marginBottom: responsiveHeight(4),
@@ -136,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fff',
     color: "black"
-},
+  },
   sendBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -155,6 +160,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: responsiveFontSize(2),
     marginLeft: 8,
+  },
+  backButton: {
+    marginLeft: responsiveWidth(1),
+    width: responsiveWidth(10),
+    // backgroundColor: '#3c3c3c',
+    height: responsiveHeight(5),
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom:responsiveHeight(3),
+    position:'absolute',
+    top:10
   },
 });
 export default PhoneNoScreen;

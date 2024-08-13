@@ -20,12 +20,11 @@ const ClaimForm = (props) => {
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
     const user = useSelector((state) => state.user.user);
     const userId = user.id;
+    console.warn('user id', userId)
     const navigation = useNavigation();
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [selectedFileType, setSelectedFileType] = useState('');
-
-
     const route = useRoute();
     const [totalBoxes, setTotalBoxes] = useState(props?.route.params?.totalBoxes);
     const [totalAmount, setTotalAmount] = useState(props?.route.params);
@@ -229,7 +228,6 @@ const ClaimForm = (props) => {
         if (uploadedInvoiceFileIds.includes(null) || uploadedTransportFileIds.includes(null)) {
             return;
         }
-
         const formData = new FormData();
         formData.append('purchase_date', selectedDate ? selectedDate.toISOString().split('T')[0] : '');
         formData.append('distributor_id', selectedDistributor);
@@ -417,7 +415,7 @@ const ClaimForm = (props) => {
                     </View>
 
                     <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('invoice')}>
-                        <Text style={styles.fileButtonText}>Upload Invoice Images / Capture New</Text>
+                        <Text style={styles.fileButtonText}>Upload Invoice Images</Text>
                     </TouchableOpacity>
 
                     {invoiceFiles.map((file, index) => (
@@ -435,7 +433,7 @@ const ClaimForm = (props) => {
                     ))}
 
                     <TouchableOpacity style={styles.fileButton} onPress={() => handleFileSelection('transport')}>
-                        <Text style={styles.fileButtonText}>Upload Transport Receipt Images / Capture New</Text>
+                        <Text style={styles.fileButtonText}>Upload Transport Receipt Images</Text>
                     </TouchableOpacity>
 
                     {transportFiles.map((file, index) => (
@@ -494,7 +492,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     container1: {
-        flex: 1,
         backgroundColor: '#fff',
         paddingHorizontal: 30,
         paddingTop: 20,
@@ -561,7 +558,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         paddingHorizontal: 30,
         borderRadius: 10,
-        marginBottom: responsiveHeight(4),
+        marginBottom: responsiveHeight(15),
         marginTop: responsiveHeight(4)
     },
     submitButtonText: {

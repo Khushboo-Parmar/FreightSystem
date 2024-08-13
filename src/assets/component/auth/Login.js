@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,8 +13,24 @@ const Login = () => {
     const [otp, setOtp] = useState('');
     const navigation = useNavigation();
     const dispatch = useDispatch();
-
+    const [timer, setTimer] = useState(60); // Timer in seconds
     const inputRefs = useRef([]);
+
+    useEffect(() => {
+        // Start the timer
+        const interval = setInterval(() => {
+            setTimer(prevTimer => {
+                if (prevTimer <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prevTimer - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval); // Clean up on unmount
+    }, []);
+
 
     const handleSubmit = async () => {
         try {
@@ -52,7 +68,7 @@ const Login = () => {
                     text1: 'Bad Request',
                     text2: data.message,
                 });
-                navigation.navigate('SignUp');
+                navigation.navigate('SignUp', { user_id: data.user_id });
 
             } else {
                 console.error('Login failed', data.message);
@@ -87,6 +103,8 @@ const Login = () => {
             console.warn('Response data:', data);
 
             if (response.status === 200) {
+                setTimer(60); //
+
                 Toast.show({
                     type: 'success',
                     text1: 'OTP Resent',
@@ -109,20 +127,16 @@ const Login = () => {
             });
         }
     };
-
-
     const focusNextInput = (index) => {
         if (index < 5) {
             inputRefs.current[index + 1].focus();
         }
     };
-
-
     return (
         <View style={s.containerWhite}>
             <Image style={styles.bgImagelogin} source={require('../../Images/logo.png')} />
             <View style={s.container}>
-                <Text style={styles.bigHeading}>WELCOME BACK!</Text>
+                <Text style={styles.bigHeading}>WELCOME BACK</Text>
                 <Text style={styles.smallPara}>Please Login</Text>
 
                 <Text style={styles.label}>
@@ -147,8 +161,11 @@ const Login = () => {
                         />
                     ))}
                 </View>
+                <Text style={styles.timerText}>
+                    {timer > 0 ? `Resend OTP in ${timer}s` : 'You can resend OTP now'}
+                </Text>
 
-                <TouchableOpacity onPress={handleResend}>
+                <TouchableOpacity onPress={handleResend}  disabled={timer > 0}>
                     <Text style={styles.buttonText2}>Resend OTP</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={handleSubmit}>

@@ -18,7 +18,7 @@ export default function SplashScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../Images/ssss.jpg')}
+        source={require('../../Images/logo.png')}
         style={styles.logo}
         resizeMode="contain"
       />

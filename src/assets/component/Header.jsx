@@ -3,8 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const Header = () => {
     const phoneNumber = useSelector((state) => state.phone.phoneNumber);
@@ -15,16 +14,22 @@ const Header = () => {
             {user && (
                 <View style={styles.content}>
                     <View style={styles.header}>
-                        <View style={styles.header2}>
-                           <Ionicons name="person-circle-outline" size={25} color="white" />
-                           <Text style={styles.greeting}>Hello, {user.full_name}</Text>
-                        </View>
-                        <View style={styles.header2}>
+                        <TouchableOpacity style={styles.header2} onPress={()=>{navigation.navigate('Profile')}}>
+                           <Image source={{uri:user?.file}} style={{width:responsiveWidth(8),height:responsiveHeight(4),borderRadius:5,borderWidth:1}} />
+                           <View>
+                           <Text style={{ fontWeight: 'bold', color: 'black', fontSize: responsiveFontSize(2) }}>Hello, <Text style={{ fontWeight: '500', fontSize: responsiveFontSize(1.8), textTransform:'capitalize' }}>
+                            {user?.full_name}
+                            {/* {user?.full_name.charAt(0).toUpperCase() + user?.full_name.slice(1)} */}
+                            </Text></Text>
+                           <Text style={{ fontWeight: '300', fontSize: responsiveFontSize(1.5), color: 'black' }}>{user?.email}</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>{navigation.openDrawer()}} style={[styles.header2,{backgroundColor:'black', borderWidth:1,paddingHorizontal:responsiveWidth(2.5),paddingVertical:responsiveWidth(2),borderRadius:10}]}>
                        
                             <TouchableOpacity onPress={()=>{navigation.openDrawer()}}>
-                                <Ionicons name="menu-outline" size={25} color="white" />
+                            <Icon name="align-right" size={18} color="white" />
                             </TouchableOpacity>
-                        </View>
+                        </TouchableOpacity>
        
                     </View>
      
@@ -46,13 +51,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#ee1d23',
-        padding: responsiveHeight(2)
+        backgroundColor: 'white',
+        // padding: responsiveHeight(2)
+        paddingHorizontal: responsiveHeight(2),
+        paddingVertical:responsiveHeight(2)
     },
     greeting: {
         fontSize: responsiveFontSize(1.8),
-        fontWeight: 'bold',
-        color: 'white',
+        // fontWeight: 'bold',
+        color: 'black',
         letterSpacing:0.5,
     },
     profilepic: {

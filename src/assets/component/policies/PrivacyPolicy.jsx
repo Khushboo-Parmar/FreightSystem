@@ -4,19 +4,21 @@ import { useNavigation } from '@react-navigation/native';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Header from '../Header';
+import Footer from '../Footer/Footer';
 
 const PrivacyPolicy = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.container}>
+<>
+{/* <View style={styles.container}> */}
 
 <Header />
       <ScrollView style={styles.content}>
         <View>
-          <Text style={{ lineHeight: responsiveHeight(2.4), marginTop: responsiveHeight(2), fontSize: responsiveFontSize(2.2), fontWeight: '800', color: 'black'}}>PRIVACY POLICY</Text>
+          <Text style={styles.heading}>Privacy Policy </Text>
         </View>
-        <Text style={{ lineHeight: responsiveHeight(2.4), marginTop: responsiveHeight(2), fontSize: responsiveFontSize(1.4), fontWeight: '400', color: 'grey' }}>
+        <Text style={styles.text}>
           Privacy Policy
           We Are Committed To Protecting Your Privacy. We Will Only Use The Information That We Collect About You Lawfully.
           We Collect Information About You For 2 Reasons: Firstly, To Process Your Order And Second, To Provide You With The Best Possible Service.
@@ -29,22 +31,24 @@ const PrivacyPolicy = () => {
           We May Use Technology To Track The Patterns Of Behaviour Of Visitors To Our Site. This Can Include Using A "Cookie" Which Would Be Stored On Your Browser. You Can Usually Modify Your Browser To Prevent This Happening. The Information Collected In This Way Can Be Used To Identify You Unless You Modify Your Browser Settings.
           If You Have Any Questions/Comments About Privacy, You Should Contact Us.
         </Text>
-
+        <View style={{paddingTop:responsiveHeight(6.5), backgroundColor:'white'}}></View>
       </ScrollView>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
-      </TouchableOpacity>
-    </View>
+    {/* </View> */}
+
+    <Footer />
+</>
   );
 };
 
 const styles = StyleSheet.create({
 
   container: {
-    flex: 1,
+    // flex: 1,
   },
   content: {
-    padding:responsiveWidth(5) 
+    padding:responsiveWidth(5) ,
+    backgroundColor:'white',
+    height:'100%'
   },
 
   heading: {
@@ -52,13 +56,15 @@ const styles = StyleSheet.create({
     lineHeight: responsiveHeight(2.4),
     marginTop: responsiveHeight(2),
     fontSize: responsiveFontSize(2.2),
-    fontWeight: '800'
+    fontWeight: '800',
   },
   text: {
-    fontSize: responsiveFontSize(1.8),
-    lineHeight: 22,
-    color: 'black',
-    textAlign: 'justify'
+    lineHeight: responsiveHeight(2.4),
+    marginTop: responsiveHeight(2), 
+    fontSize: responsiveFontSize(1.4), 
+    fontWeight: '400', 
+    color: 'grey' ,
+    textAlign:"justify"
   },
   backButton: {
     marginLeft: responsiveWidth(4),

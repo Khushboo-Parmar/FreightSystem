@@ -3,7 +3,6 @@ import { View, TextInput, StyleSheet, TouchableOpacity, Text, Image, ScrollView,
 import { responsiveWidth, responsiveHeight, responsiveFontSize } from 'react-native-responsive-dimensions';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
-import DocumentPicker from 'react-native-document-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
@@ -11,13 +10,11 @@ import Toast from 'react-native-toast-message';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import CaptchaV2Lib1 from './Recaptcha/Recaptcha';
 import Modal from 'react-native-modal';
-
 const SignUpForm = () => {
     const route = useRoute();
     const { userId } = route.params;
     const { user_id } = route.params || {}; 
     const phoneNumber = useSelector(state => state.phone.phoneNumber);
-
     const [partnerName, setPartnerName] = useState('');
     const [gstNo, setGstNo] = useState('');
     const [address, setAddress] = useState('');
@@ -27,29 +24,20 @@ const SignUpForm = () => {
     const [email, setEmail] = useState('');
     const [state, setState] = useState('');
     const [stateList, setStateList] = useState([]);
-
     const [robot, setRobot] = useState(false);
-
     const [isModalVisible, setModalVisible] = useState(false);
 
+    const [isValidGstNo, setIsValidGstNo] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false); 
     const navigation = useNavigation();
 
     const handleFileUpload = async () => {
-        if (!file) {
-            ToastAndroid.show('Please select a file first', ToastAndroid.SHORT);
-            return null;
-        }
-
-        if (!robot) {
-            ToastAndroid.show('Please Verify', ToastAndroid.SHORT);
-            return null;
-        }
 
         const formData = new FormData();
         formData.append('file', {
-            uri: file.uri,
-            name: file.name,
-            type: file.type,
+            uri: file?.uri,
+            name: file?.name,
+            type: file?.type,
         });
 
         try {
@@ -75,20 +63,18 @@ const SignUpForm = () => {
             }
         } catch (error) {
             console.error('Error:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Failed to upload the file. Please check your network connection and try again',
-            });
+
             return null;
         }
     };
 
     const handleSignUp = async () => {
+        if (!robot) {
+            ToastAndroid.show('Please complete the CAPTCHA verification to proceed.', ToastAndroid.SHORT);
+            return null;
+        }
         const uploadedFileId = await handleFileUpload();
-        if (!uploadedFileId) return;
-
         const formData = new FormData();
-        console.log('form data', formData);
         formData.append('full_name', partnerName);
         formData.append('gst_no', gstNo);
         formData.append('address', address);
@@ -97,7 +83,6 @@ const SignUpForm = () => {
         formData.append('user_id', userId || user_id);
         formData.append('file_id', uploadedFileId);
         formData.append('email', email);
-
         try {
             const response = await fetch(`${process.env.BASE_URL}sign-up`, {
                 method: 'POST',
@@ -107,33 +92,27 @@ const SignUpForm = () => {
                 body: formData,
             });
             const data = await response.json();
-            console.log('data response', data)
+
             if (data.status === 200) {
-                console.log('Success:', data);
+
                 ToastAndroid.show('Sign up successful', ToastAndroid.SHORT);
-
-                navigation.navigate('Loginphone', user_id);
+                navigation.navigate('Loginphone');
             } else {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Sign up failed',
-                    text2: data.message,
-                });
-                ToastAndroid.show(`${data?.message}`, ToastAndroid.SHORT);
-
+                // Toast.show({
+                //     type: 'error',
+                //     text1: 'Sign up failed',
+                //     text2: data?.message,
+                // });
+                ToastAndroid.show(`${data?.message[0]}`, ToastAndroid.SHORT);
             }
         } catch (error) {
             console.error('Error:', error);
             ToastAndroid.show(`Failed to submit the form. Please check your network connection and try again.`, ToastAndroid.SHORT);
-
         }
     };
-
-
     const handleFileSelection = () => {
         setModalVisible(true);
     };
-
     const selectFile = (source) => {
         setModalVisible(false);
 
@@ -164,9 +143,6 @@ const SignUpForm = () => {
             launchImageLibrary(options, callback);
         }
     };
-
- 
-
     useEffect(() => {
         const fetchStateList = async () => {
             try {
@@ -185,111 +161,141 @@ const SignUpForm = () => {
 
         fetchStateList();
     }, []);
-
-
     const removeFile = () => {
         setFile(null);
     };
 
+    const validateGstNo = (gst) => {
+        const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/;
+        return gstRegex.test(gst);
+    };
 
 
+    const handleGstNoChange = (value) => {
+        setGstNo(value);
+        setIsValidGstNo(validateGstNo(value));
+    };
+    const onRefresh = async () => {
+        setIsRefreshing(true);
+        // await fetchStateList();
+        setIsRefreshing(false);
+    };
     return (
         <View style={styles.container}>
-            <Image style={styles.bgLogo} source={require('../../Images/logo.png')} />
-            {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
-      </TouchableOpacity> */}
+            <Image style={styles.bgLogo} source={require('../../Images/BTIcon.png')} />
 
             <Text style={styles.signupHeading}>Sign Up</Text>
+            <ScrollView showsVerticalScrollIndicator={false}
+            refreshControl={
+                <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={onRefresh}
+                />
+            }>
+                <View >
+                    <View style={styles.inputContainer}>
+                        <Icon name="user" size={19} color="#ee1d23" style={styles.icon} />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="PARTNER NAME"
+                            placeholderTextColor="grey"
+                            value={partnerName}
+                            onChangeText={setPartnerName}
 
-            <ScrollView>
-                <View style={styles.inputContainer}>
-                    <Icon name="user" size={18} color="#ee1d23" style={styles.icon} />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="PARTNER NAME"
-                        placeholderTextColor="grey"
-                        value={partnerName}
-                        onChangeText={setPartnerName}
-
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    <Icon name="envelope" size={20} color="#ee1d23" style={styles.icon} />
-                    <TextInput
-                        style={styles.inputemail}
-                        placeholder="MAIL ID"
-                        keyboardType="email-address"
-                        value={email}
-                        onChangeText={setEmail}
-                        placeholderTextColor="grey"
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    {/* <Icon name="sticky-note" size={18} color="#ee1d23" style={styles.icon} /> */}
-                    <Icon5 name="file-alt" size={18} color="#ee1d23" style={styles.icon} />
-                    <TextInput
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Icon name="envelope" size={19} color="#ee1d23" style={styles.icon} />
+                        <TextInput
+                            style={styles.inputemail}
+                            placeholder="MAIL ID"
+                            keyboardType="email-address"
+                            value={email}
+                            onChangeText={setEmail}
+                            placeholderTextColor="grey"
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Icon5 name="file-alt" size={19} color="#ee1d23" style={styles.icon} />
+                        <TextInput
+                            style={[styles.input, !isValidGstNo && styles.errorBorder]}
+                            placeholder="GST NO."
+                            value={gstNo}
+                            onChangeText={handleGstNoChange}
+                            placeholderTextColor="grey"
+                        />
+                        {/* <TextInput
                         style={styles.input}
                         placeholder="GST NO."
                         value={gstNo}
                         onChangeText={setGstNo}
                         placeholderTextColor="grey"
-                    />
-                </View>
-                <View style={styles.inputContainer}>
-                    <Icon name="address-card-o" size={18} color="#ee1d23" style={styles.icon} />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="ADDRESS"
-                        value={address}
-                        onChangeText={setAddress}
-                        placeholderTextColor="grey"
-                    />
-                </View>
-                <View style={[styles.inputContainer, { marginLeft: responsiveWidth(2) }]}>
-                    <Icon name="map-marker" size={18} color="#ee1d23" style={styles.icon} />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="CITY"
-                        value={city}
-                        onChangeText={setCity}
-                        placeholderTextColor="grey"
-                    />
-                </View>
-                <View style={[styles.inputContainer, { marginLeft: responsiveWidth(2) }]}>
-                    <Icon name="globe" size={18} color="#ee1d23" style={styles.icon} />
+                    />  */}
+                    </View>
 
-                    <Dropdown
-                        style={styles.input}
-                        data={stateList}
-                        labelField="label"
-                        valueField="value"
-                        placeholder="STATE"
-                        itemTextStyle={styles.itemTextStyle}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        value={state}
-                        onChange={item => {
-                            setState(item.value);
-                        }}
-                    />
-                </View>
+                    {!isValidGstNo && <Text style={styles.errorText}>(Invalid GST Number)</Text>}
 
+                    <View style={styles.inputContainer}>
+                        <Icon name="address-card-o" size={19} color="#ee1d23" style={styles.icon} />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="ADDRESS"
+                            value={address}
+                            onChangeText={setAddress}
+                            placeholderTextColor="grey"
+                        />
+                    </View>
+                    <View style={[styles.inputContainer]}>
+                        <Icon name="map-marker" size={19} color="#ee1d23" style={styles.icon} />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="CITY"
+                            value={city}
+                            onChangeText={setCity}
+                            placeholderTextColor="grey"
+                        />
+                    </View>
+                    <View style={[styles.inputContainer]}>
+                        <Icon name="globe" size={19} color="#ee1d23" style={styles.icon} />
+
+                        <Dropdown
+                            style={styles.input}
+                            data={stateList}
+                            labelField="label"
+                            valueField="value"
+                            placeholder="STATE"
+                            itemTextStyle={{ color: 'black' }}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            value={state}
+                            onChange={item => {
+                                setState(item.value);
+                            }}
+                            search
+                            searchPlaceholder="Search..."
+                            inputSearchStyle={styles.inputSearchStyle}
+                        />
+                    </View>
+                    <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
+                        <View style={styles.modalContainer}>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.title}>Select Image</Text>
+                                <TouchableOpacity style={styles.button} onPress={() => selectFile('camera')}>
+                                    <Text style={styles.buttonText}>Take Photo</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.button} onPress={() => selectFile('gallery')}>
+                                    <Text style={styles.buttonText}>Choose from Gallery</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
+                                    <Text style={styles.buttonText}>Cancel</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+                </View>
                 <TouchableOpacity style={styles.uploadButton} onPress={handleFileSelection}>
                     <Text style={styles.uploadButtonText}>Upload Shop Image</Text>
                 </TouchableOpacity>
-                {/* {file && (
-                    <View style={styles.imageContainer}>
-                        {file.type.includes('image') ? (
-                            <Image source={{ uri: file.uri }} style={styles.image} />
-                        ) : (
-                            <Text>{file.name}</Text>
-                        )}
-                        <TouchableOpacity onPress={removeFile} style={styles.removeFileButton}>
-                            <Text>Remove File</Text>
-                        </TouchableOpacity>
-                    </View>
-                )} */}
                 {file && (
                     <View style={styles.imageContainer}>
                         {file.type.includes('image') ? (
@@ -315,38 +321,22 @@ const SignUpForm = () => {
                     </View>
                 )}
                 <CaptchaV2Lib1 setRobot={setRobot} />
-                <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
-                    <Text style={styles.signupButtonText}>Sign Up</Text>
-                </TouchableOpacity>
             </ScrollView>
 
-            <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
-            <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                    <Text style={styles.title}>Select Image</Text>
-                            <TouchableOpacity style={styles.button} onPress={() => selectFile('camera')}>
-                                <Text style={styles.buttonText}>Take Photo</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.button} onPress={() => selectFile('gallery')}>
-                                <Text style={styles.buttonText}>Choose from Gallery</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
-                                <Text style={styles.buttonText}>Cancel</Text>
-                            </TouchableOpacity>
-                </View>
-                </View>
-            </Modal>
+            <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
+                <Text style={styles.signupButtonText}>Sign Up</Text>
+            </TouchableOpacity>
 
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
         backgroundColor: 'white',
         paddingBottom: responsiveHeight(2),
+        // paddingHorizontal: responsiveWidth(10)
     },
     signupHeading: {
         fontSize: responsiveFontSize(2.5),
@@ -360,7 +350,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: responsiveHeight(2),
         width: responsiveWidth(80),
-        paddingHorizontal: responsiveWidth(3),
+        // gap:2,
     },
     input: {
         flex: 1,
@@ -370,7 +360,8 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
         fontSize: responsiveFontSize(1.8),
         color: 'black',
-        textTransform: 'uppercase'
+        textTransform: 'uppercase',
+        marginLeft: responsiveWidth(0.5)
     },
     inputemail: {
         flex: 1,
@@ -382,11 +373,12 @@ const styles = StyleSheet.create({
         color: 'black',
     },
     icon: {
-        marginRight: responsiveWidth(2.5),
+        // marginRight: responsiveWidth(1),
+        width: responsiveWidth(6),
     },
     uploadButton: {
         backgroundColor: '#fff',
-        paddingVertical: responsiveHeight(2),
+        paddingVertical: responsiveHeight(1.8),
         paddingHorizontal: responsiveWidth(2.5),
         borderRadius: 5,
         marginTop: responsiveHeight(2),
@@ -464,18 +456,16 @@ const styles = StyleSheet.create({
         color: 'black',
     },
     bgLogo: {
-        height: responsiveHeight(25),
-        width: responsiveWidth('100'),
-        resizeMode:'cover'
+        height: responsiveWidth(20),
+        width: responsiveWidth(20),
+        resizeMode: 'cover'
     },
     itemTextStyle: {
         fontSize: responsiveFontSize(2),
     },
     modalContainer: {
-        // flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        // backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalContent: {
         backgroundColor: 'white',
@@ -492,8 +482,8 @@ const styles = StyleSheet.create({
     title: {
         fontSize: responsiveFontSize(2),
         marginBottom: responsiveHeight(2),
-        color:'black',
-        fontWeight:"700",
+        color: 'black',
+        fontWeight: "700",
     },
     button: {
         paddingVertical: responsiveHeight(1.5),
@@ -507,8 +497,20 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: responsiveFontSize(2),
-        fontWeight:"600"
+        fontWeight: "600"
     },
+    errorBorder: {
+        borderColor: 'red',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: responsiveFontSize(1.8),
+        alignSelf:'flex-end',
+    },
+    inputSearchStyle: {
+        height: responsiveHeight(6),
+        fontSize: responsiveFontSize(1.8),
+        color:'black',
+      },
 });
-
 export default SignUpForm;

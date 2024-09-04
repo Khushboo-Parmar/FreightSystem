@@ -11,6 +11,7 @@ const DrawerNavigatorPage = () => {
     <Drawer.Navigator
       screenOptions={{
         headerShown: false,
+        swipeEnabled: false
       }}
       drawerContent={(props) => <CustumDrawerContent {...props} />}
     >

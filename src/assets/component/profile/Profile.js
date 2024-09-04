@@ -1,211 +1,248 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity, Modal, ScrollView, TextInput } from "react-native";
+
+// import React from "react";
+// import { View, StyleSheet, Image, Text, TextInput } from "react-native";
+// import { responsiveHeight, responsiveWidth, responsiveFontSize } from "react-native-responsive-dimensions";
+// import { useSelector } from "react-redux";
+// import Footer from "../Footer/Footer";
+// import { TouchableOpacity } from "react-native-gesture-handler";
+// import FontAwesome from 'react-native-vector-icons/FontAwesome';
+// import Header from "../Header";
+// import { useNavigation } from "@react-navigation/native";
+
+
+// const Profile = () => {
+
+//     const navigation = useNavigation();
+
+
+//     const user = useSelector(state => state.user.user);
+//     return (
+//         <>
+
+//             <View style={styles.container}>
+//                 {user && (
+//                     <>
+//                         <View style={styles.header}>
+//                             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+//                                 <FontAwesome name="chevron-left" size={responsiveFontSize(2)} color="white" />
+//                             </TouchableOpacity>
+//                             <Image
+//                                 style={styles.profileImage}
+//                                 source={{ uri: user?.file }}
+//                             />
+//                             <Text style={[styles.userName, { textTransform: "capitalize" }]}>{user?.full_name}</Text>
+//                             <Text style={styles.lastVisit}>{user?.email}</Text>
+//                         </View>
+//                         <View style={styles.infoContainer}>
+//                             <Text style={styles.label}>EMAIL</Text>
+//                             <TextInput style={styles.input} editable={false} value={`${user?.email}`} />
+//                             <Text style={styles.label}>PHONE</Text>
+//                             <TextInput style={styles.input} editable={false} value={`+91 ${user?.phone}`} />
+
+//                             <Text style={styles.label}>CITY, STATE</Text>
+//                             <TextInput style={[styles.input, { textTransform: "capitalize" }]} editable={false} value={`${user?.city},${user?.state}`} />
+
+//                             <Text style={styles.label}>GSTNO</Text>
+//                             <TextInput style={styles.input} editable={false} value={`${user?.gstNo}`} />
+//                         </View>
+//                     </>
+//                 )}
+//             </View>
+//             <Footer no={true} />
+//             {/* <Footer/> */}
+//         </>
+
+//     );
+// };
+
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         backgroundColor: 'white',
+//         height: '100%',
+//     },
+//     header: {
+//         backgroundColor: 'black',
+//         paddingTop: responsiveHeight(10),
+//         paddingBottom: responsiveHeight(5),
+//         // height:responsiveHeight(35),
+//         // width:responsiveWidth(100),
+//         alignItems: 'center',
+//         // justifyContent:'center',
+//         position:'relative'
+//     },
+//     profileImage: {
+//         width: responsiveWidth(24),
+//         height: responsiveWidth(24),
+//         borderRadius: responsiveWidth(12),
+//         borderColor: '#fff',
+//         borderWidth: 2,
+//     },
+//     userName: {
+//         color: '#fff',
+//         fontSize: responsiveFontSize(2.5),
+//         marginTop: responsiveHeight(2),
+//     },
+//     lastVisit: {
+//         color: '#fff',
+//         fontSize: responsiveFontSize(1.5),
+//         marginTop: responsiveHeight(0.5),
+
+//     },
+//     infoContainer: {
+//         padding: responsiveWidth(7),
+//         backgroundColor: '#fff',
+//         borderTopLeftRadius: 30,
+//         borderTopRightRadius: 30,
+//         marginTop: -responsiveHeight(3),
+//         // paddingHorizontal: responsiveWidth(3),
+//     },
+//     label: {
+//         color: '#888',
+//         fontSize: responsiveFontSize(1.5),
+//         marginBottom: responsiveHeight(1),
+//         marginTop: responsiveHeight(2),
+//     },
+//     input: {
+//         borderBottomWidth: 1,
+//         borderBottomColor: '#eee',
+//         fontSize: responsiveFontSize(2),
+//         paddingBottom: responsiveHeight(0.5),
+//         color: '#333',
+
+//     },
+//     backButton: {
+//         width: responsiveWidth(10),
+//         height: responsiveHeight(5),
+//         borderRadius: 25,
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         position: 'absolute',  
+//         top: responsiveHeight(1), 
+//         left: responsiveWidth(3),
+//         backgroundColor:'red'
+//     },
+
+// });
+
+// export default Profile;
+import React from "react";
+import { View, StyleSheet, Image, Text, TextInput } from "react-native";
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from "react-native-responsive-dimensions";
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useDispatch, useSelector } from 'react-redux';
-import Toast from 'react-native-toast-message';
+import { useSelector } from "react-redux";
+import Footer from "../Footer/Footer";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import FontAwesome from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from "@react-navigation/native";
 
 const Profile = () => {
-    const user = useSelector(state => state.user.user);
     const navigation = useNavigation();
-    const handleEdit = async () => {
-        navigation.navigate('UpdateProfile');
-    }
-    console.log('p user', user)
+    const user = useSelector(state => state.user.user);
+
     return (
-        <View style={styles.container}>
+        <>
+            <View style={styles.container}>
+            <View style={{backgroundColor:'black'}}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={{backgroundColor:'black',paddingHorizontal:responsiveHeight(2),paddingVertical:responsiveHeight(3)}}>
+                                <FontAwesome name="chevron-left" size={responsiveFontSize(2.5)} color="white" />
+                            </TouchableOpacity>
+            </View>
+                {user && (
+                    <>
 
-            {user && (
-                <>
-                    {/* <View style={styles.curve}> */}
-                        <Image
-                            style={styles.profilepic}
-                            source={{ uri: user?.file }}
-                        />
-                    {/* </View> */}
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
-                    </TouchableOpacity>
-                    <View style={styles.infoContainer}>
-                        <View style={styles.infoBox}>
-                            <View style={styles.infoIcon}>
-                                <FontAwesome name="user-o" size={25} color="black" />
-                            </View>
-                            <View style={styles.infoDetail}>
-                                <Text style={styles.infoDetailText}>{user.full_name}</Text>
-                            </View>
+                        <View style={styles.header}>
+                        
+                            <Image
+                                style={styles.profileImage}
+                                source={{ uri: user?.file }}
+                            />
+                            <Text style={[styles.userName, { textTransform: "capitalize" }]}>{user?.full_name}</Text>
+                            <Text style={styles.lastVisit}>{user?.email}</Text>
                         </View>
+                        <View style={styles.infoContainer}>
+                            <Text style={styles.label}>EMAIL</Text>
+                            <TextInput style={styles.input} editable={false} value={`${user?.email}`} />
+                            <Text style={styles.label}>PHONE</Text>
+                            <TextInput style={styles.input} editable={false} value={`+91 ${user?.phone}`} />
 
-                        <View style={styles.infoBox}>
-                            <View style={styles.infoIcon}>
-                                <FontAwesome name="envelope-o" size={25} color="black" />
-                            </View>
-                            <View style={styles.infoDetail}>
-                                <Text style={styles.infoDetailText}>{user.email}</Text>
-                            </View>
+                            <Text style={styles.label}>CITY, STATE</Text>
+                            <TextInput style={[styles.input, { textTransform: "capitalize" }]} editable={false} value={`${user?.city}, ${user?.state}`} />
+
+                            <Text style={styles.label}>GSTNO</Text>
+                            <TextInput style={styles.input} editable={false} value={`${user?.gstNo}`} />
                         </View>
-
-                        <View style={styles.infoBox}>
-                            <View style={styles.infoIcon}>
-                                <FontAwesome name="address-book" size={25} color="black" />
-                            </View>
-                            <View style={styles.infoDetail}>
-                                <Text style={styles.infoDetailText}>{user.address}</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.infoBox}>
-                            <View style={styles.infoIcon}>
-                                <FontAwesome name="map-marker" size={25} color="black" />
-                            </View>
-                            <View style={styles.infoDetail}>
-                                <Text style={styles.infoDetailText}>{user.city}</Text>
-                            </View>
-                        </View>
-
-
-                    </View>
-                    {/* 
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.btn} onPress={handleEdit}>
-                            <Text style={styles.btnText}>Edit Profile</Text>
-                        </TouchableOpacity>
-                    </View> */}
-
-                </>
-            )}
-        </View>
+                    </>
+                )}
+            </View>
+            <Footer no={true} />
+        </>
     );
 };
-
-export default Profile;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
     },
-    curve: {
-        position: 'relative',
-        width: responsiveWidth(100),
-        height: responsiveHeight(25),
-        backgroundColor: '#ee1d23',
-        borderBottomLeftRadius: responsiveWidth(45),
-        borderBottomRightRadius: responsiveWidth(45),
+    header: {
+        backgroundColor: 'black',
+        // paddingTop: responsiveHeight(10),
+        paddingBottom: responsiveHeight(5),
         alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 10,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-        elevation: 10,
+        zIndex: 0,
+        position: 'relative'
     },
-    profilepic: {
-        position: 'absolute',
-        height: responsiveHeight(15),
-        width: responsiveWidth(28),
-        borderRadius: responsiveWidth(14),
+    profileImage: {
+        width: responsiveWidth(24),
+        height: responsiveWidth(24),
+        borderRadius: responsiveWidth(12),
+        borderColor: '#fff',
         borderWidth: 2,
-        borderColor: 'red',
-        top: responsiveHeight(15),
-        left: (responsiveWidth(100) - responsiveWidth(28)) / 2,
+    },
+    userName: {
+        color: '#fff',
+        fontSize: responsiveFontSize(2.5),
+        marginTop: responsiveHeight(2),
+    },
+    lastVisit: {
+        color: '#fff',
+        fontSize: responsiveFontSize(1.5),
+        marginTop: responsiveHeight(0.5),
     },
     infoContainer: {
-        marginTop: responsiveHeight(10),
-        paddingHorizontal: responsiveWidth(5),
-    },
-    infoBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        padding: responsiveWidth(7),
         backgroundColor: '#fff',
-        // borderRadius: 10,
-        padding: responsiveHeight(2),
-        marginBottom: responsiveHeight(1.5),
-        // shadowColor: "#000",
-        // shadowOffset: {
-        //     width: 0,
-        //     height: 2,
-        // },
-        // shadowOpacity: 0.1,
-        // shadowRadius: 3.84,
-        // elevation: 5,
-    },
-    infoIcon: {
-        marginRight: responsiveWidth(5),
-    },
-    infoDetail: {
-        flex: 1,
-    },
-    infoDetailText: {
-        fontSize: responsiveFontSize(2.5),
-        color: '#333',
-    },
-    buttonContainer: {
-        alignItems: 'center',
-        marginTop: responsiveHeight(5),
-    },
-    btn: {
-        backgroundColor: "#ee1d23",
-        borderRadius: 20,
-        width: responsiveWidth(50),
-        padding: responsiveHeight(2),
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 5,
-        },
-        shadowOpacity: 0.36,
-        shadowRadius: 6.68,
-        elevation: 11,
-        alignSelf: 'center'
-    },
-    btnText: {
-        fontSize: responsiveFontSize(2),
-        color: 'white',
-        textAlign: 'center',
-    },
-    inputContainer: {
-        gap: 8,
-        marginVertical: 10,
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        marginTop: -responsiveHeight(3),
     },
     label: {
-        fontFamily: 'Poppins-SemiBold',
-        color: 'black',
-    },
-    required: {
-        color: 'red',
+        color: '#888',
+        fontSize: responsiveFontSize(1.5),
+        marginBottom: responsiveHeight(1),
+        marginTop: responsiveHeight(2),
     },
     input: {
-        borderWidth: 1,
-        borderRadius: 8,
-        borderColor: 'black',
-        paddingHorizontal: 10,
-        color: 'black',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        fontSize: responsiveFontSize(2),
+        paddingBottom: responsiveHeight(0.5),
+        color: '#333',
     },
     backButton: {
-        marginLeft: responsiveWidth(1),
+        position: 'absolute',
+        top: responsiveHeight(0),
+        left: responsiveWidth(0),
         width: responsiveWidth(10),
-        // backgroundColor: '#3c3c3c',
         height: responsiveHeight(5),
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'absolute',
-        Top: responsiveHeight(2),
-        left: responsiveWidth(1),
+        backgroundColor: 'red',
+        zIndex: 2,  // Higher zIndex to ensure visibility over other components
     },
-    title: {
-        fontSize: responsiveFontSize(2),
-        fontWeight: 'bold',
-        textAlign: 'center',
-        // marginBottom: responsiveHeight(2),
-        color: 'black',
-    },
-
 });
+
+export default Profile;
+
+

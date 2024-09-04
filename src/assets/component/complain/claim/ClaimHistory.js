@@ -1,129 +1,184 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from "react-native-responsive-dimensions";
 import { useSelector } from 'react-redux';
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import placeholderImg from '../../../Images/placeImg.jpg';
 import FilterSelect from "./FilterSelect";
+import Footer from "../../Footer/Footer";
+import Header from "../../Header";
 
-const placeholderImage = placeholderImg;
 const ClaimHistory = () => {
     const navigation = useNavigation();
     const user = useSelector(state => state.user.user);
-    console.log('user claim histry', user)
-    const userId = user.id;
+    const userId = user?.id;
+
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
-    
-    // useEffect(() => {
-        const fetchComplaints = async () => {
-            setLoading(true);
-            setRefreshing(true);
-            try {
-                const token = await AsyncStorage.getItem('token');
-
-                if (!token) {
-                    throw new Error("Token not found");
+    const [filterValue, setFilterValue] = useState('');
+    const [dates, setDates] = useState({ start: '', end: '' });
+    const [shouldNavigate, setShouldNavigate] = useState(false);
+    const hasNavigated = useRef(false);
+    useEffect(() => {
+        const handleBeforeRemove = (e) => {
+            if (!hasNavigated.current) {
+                if (e.data.action.type === 'POP' || e.data.action.type === 'GO_BACK') {
+                    e.preventDefault();
+                    setShouldNavigate(true);
                 }
-
-                const response = await fetch(`${process.env.BASE_URL}claim-history`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch complaints: ${response.statusText}`);
-                }
-                const data = await response.json();
-                if (response.ok) {
-                    setComplaints(data);
-                } else {
-                    throw new Error("Invalid response structure");
-                }
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
-                setRefreshing(false);
             }
         };
+        const unsubscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+        return () => {
+            unsubscribe();
+        };
+    }, [navigation]);
 
-    //     if (userId) {
-    //         fetchComplaints();
-    //     } else {
-    //         setError("User ID not found");
-    //     }
-    // }, [userId]);
     useEffect(() => {
-        if (userId) {
-            fetchComplaints();
-        } else {
-            setError("User ID not found");
+        if (shouldNavigate) {
+            hasNavigated.current = true;
+            navigation.navigate('LoginDashboard');
         }
-    }, [userId]);
+    }, [shouldNavigate, navigation]);
+
+    const fetchComplaints = useCallback(async (filterValue, selectedDates) => {
+        setLoading(true);
+        setRefreshing(true);
+
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) {
+                throw new Error("Token not found");
+            }
+            const start = new Date(dates?.dates?.start).toLocaleDateString();
+            const end = new Date(dates?.dates?.end).toLocaleDateString();
+
+            const response = await fetch(`${process.env.BASE_URL}claim-history`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+
+                    value: filterValue,
+                    start_date: dates ? dates?.dates?.start : "",
+                    end_date: dates ? dates?.dates?.end : ""
+                })
+            });
+    
+
+            const data = await response.json();
+            setComplaints(Object.values(data));
+        } catch (error) {
+            console.error('Error fetching complaints:', error.message);
+            setError(error.message);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, [filterValue, dates]);
+
+    const handleFilterChange = (value, selectedDates) => {
+        console.warn(selectedDates)
+        setDates(selectedDates);
+        setFilterValue(value);
+        if (value === '7' && selectedDates) {
+            console.warn(selectedDates)
+            setDates(selectedDates);
+            fetchComplaints(value, selectedDates);
+        } else {
+            fetchComplaints(value);
+        }
+    };
+
+    useEffect(() => {
+        if (dates?.dates?.start && dates?.dates?.end) {
+            fetchComplaints(filterValue, dates);
+        }
+    }, [dates]);
+
+
+    useFocusEffect(
+        useCallback(() => {
+            if (userId) {
+                fetchComplaints(filterValue, dates);
+            } else {
+                setError("User ID not found");
+            }
+        }, [userId, filterValue, dates])
+    );
+
     const renderTabBar = props => (
         <TabBar
             {...props}
             indicatorStyle={{ backgroundColor: 'red' }}
             style={{ backgroundColor: 'white' }}
-            labelStyle={{ color: 'black', fontSize: responsiveFontSize(1.2), fontWeight: '500' }}
+            labelStyle={{ color: 'black', fontSize: responsiveFontSize(1.5), fontWeight: '500' }}
         />
     );
-    
     const onRefresh = useCallback(() => {
+        setRefreshing(true);
         fetchComplaints();
+        fetchComplaints(filterValue, dates);
+    }, [fetchComplaints, filterValue, dates]);
     
-    }, []);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
 
     const renderComplaints = (status) => {
         const filteredComplaints = complaints.filter(complaint => complaint.status === status);
+
         return (
-            <ScrollView contentContainerStyle={styles.scrollContainer}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                />
-            }
+            <ScrollView
+                contentContainerStyle={styles.scrollContainer}
+                showsVerticalScrollIndicator={false}
+                // refreshControl={
+                //     <RefreshControl
+                //         refreshing={refreshing}
+                //         onRefresh={onRefresh}
+          
+                //     />
+                // }
             >
                 {filteredComplaints.length === 0 ? (
                     <View style={styles.noDataContainer}>
                         <Image
                             style={styles.noDataImage}
-                            // source={{ uri: placeholderImage }}
                             source={require('../../../Images/placeImg.jpg')}
                         />
                         <Text style={styles.noDataText}>No complaints found.</Text>
                     </View>
                 ) : (
                     filteredComplaints.map(complaint => (
-                        <TouchableOpacity
-                            key={complaint.search_id}
-                            style={styles.card}
-                        >
+                        <TouchableOpacity key={complaint.search_id} style={styles.card}>
+                            <Image
+                                style={styles.productImage}
+                                source={{ uri: complaint.invoice_image_url }}
+                            />
                             <View style={styles.cardContent}>
-                                <Image
-                                    style={styles.productImage}
-                                    source={{ uri: complaint.invoice_image_url }}
-                                // source={{ uri: complaint.invoice_image_url || placeholderImage }}
-                                />
                                 <View style={styles.textContainer}>
-                                    <Text style={styles.text}>Purchase Date: {complaint.purchase_date}</Text>
-                                    <Text style={styles.text}>Distributor Name: {complaint.distributor_name}</Text>
-                                    <Text style={styles.text}>Product Name: {complaint.product_name}</Text>
-                                    <Text style={styles.text}>Invoice No: {complaint.invoice_no}</Text>
-                                    <Text style={styles.text}>Total Amount: {complaint.total_amount}</Text>
-                                    <Text style={styles.text}>Freight Amount: {complaint.freight_amount}</Text>
-                                    <Text style={styles.text}>Search ID: {complaint.search_id}</Text>
-                                    {/* <Text style={styles.text}>why cancel: {complaint.cancled}</Text> */}
-                                    <Text style={styles.text}>Status: {getStatusText(complaint.status)}</Text>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
+                                        <Text style={[styles.text, { fontWeight: 'bold', fontSize: responsiveFontSize(2) }]}>{complaint.distributor_name}</Text>
+                                        <Text style={styles.text}>{formatDate(complaint.purchase_date)}</Text>
+                                    </View>
+                                    <View style={{ gap: responsiveHeight(0.8) }}>
+                                        <Text style={styles.text}>Product Name: {complaint.product_names}</Text>
+                                        <Text style={styles.text}>Invoice No: {complaint.invoice_no}</Text>
+                                        <Text style={styles.text}>Total Amount: {complaint.total_amount}</Text>
+                                        <Text style={styles.text}>Freight Amount: {complaint.freight_amount}</Text>
+                                        <Text style={styles.text}>Search ID: {complaint.search_id}</Text>
+                                        <Text style={styles.text}>Status: {getStatusText(complaint.status)}</Text>
+                                    </View>
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -133,8 +188,16 @@ const ClaimHistory = () => {
         );
     };
 
-    const FirstRoute = () => renderComplaints('0');
-    const FourthRoute = () => renderComplaints('1');
+    const getStatusText = (status) => {
+        switch (status) {
+            case '0':
+                return 'Pending';
+            case '1':
+                return 'Completed';
+            default:
+                return 'Unknown';
+        }
+    };
 
     const [index, setIndex] = useState(0);
     const [routes] = useState([
@@ -143,40 +206,40 @@ const ClaimHistory = () => {
     ]);
 
     const renderScene = SceneMap({
-        pending: FirstRoute,
-        completed: FourthRoute,
+        pending: () => (
+            <>
+                <FilterSelect onFilterChange={handleFilterChange} />
+                {renderComplaints('0')}
+            </>
+        ),
+        completed: () => (
+            <>
+                <FilterSelect onFilterChange={handleFilterChange} />
+                {renderComplaints('1')}
+            </>
+        ),
     });
 
-    const getStatusText = (status) => {
-        switch (status) {
-            case '0':
-                return 'Pending';
-            case '1':
-                return 'Completed';
-
-            default:
-                return 'Unknown';
-        }
-    };
-
     return (
-        <View style={styles.container}>
-            <View style={{ display: 'flex', flexDirection: "row", alignItems:"center", justifyContent:'flex-start', gap:responsiveWidth(25) }}>
-
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="white" />
-                </TouchableOpacity>
+        <>
+            <Header />
+            <View style={{ alignItems: "center", backgroundColor: 'white', paddingBottom: responsiveHeight(2.5) }}>
                 <Text style={styles.title}>Claim History</Text>
             </View>
-           {index === 1 && <FilterSelect />}
-            {loading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#ee1d23" />
-                    <Text style={styles.loadingText}>Loading...</Text>
-                </View>
-            ) : error ? (
-                <Text style={styles.errorText}>{error}</Text>
-            ) : (
+      
+            <ScrollView
+                style={styles.container}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.contentContainer}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+
+                    />
+                }
+            >
+   
                 <TabView
                     navigationState={{ index, routes }}
                     renderScene={renderScene}
@@ -184,13 +247,14 @@ const ClaimHistory = () => {
                     renderTabBar={renderTabBar}
                     initialLayout={{ width: responsiveWidth(100) }}
                 />
-            )}
-            <TouchableOpacity onPress={() => navigation.navigate('ClaimForm')} style={styles.addButton}>
-                <Text style={styles.buttonText}>Add More Complaints</Text>
-            </TouchableOpacity>
-        </View>
+        
+            </ScrollView>
+          
+            <Footer no={true} />
+        </>
     );
 };
+
 
 export default ClaimHistory;
 
@@ -198,7 +262,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: responsiveHeight(2),
     },
     backButton: {
         marginLeft: responsiveWidth(2),
@@ -219,6 +282,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        height: responsiveHeight(70)
     },
     loadingText: {
         marginTop: responsiveHeight(1),
@@ -233,6 +297,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         alignItems: 'center',
         paddingBottom: responsiveHeight(2),
+        paddingTop: responsiveHeight(4)
     },
     card: {
         width: responsiveWidth(90),
@@ -242,9 +307,9 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3,
-        elevation: 5,
-        marginBottom: responsiveHeight(0.5),
-        marginTop: responsiveHeight(3),
+        elevation: 2,
+        marginBottom: responsiveHeight(2),
+        marginTop: responsiveHeight(0.5),
     },
     cardContent: {
         flexDirection: 'row',
@@ -252,20 +317,21 @@ const styles = StyleSheet.create({
         padding: responsiveWidth(4),
     },
     productImage: {
-        width: responsiveWidth(20),
-        height: responsiveWidth(30),
-        borderRadius: 10,
-        resizeMode: 'contain',
+        width: '100%',
+        height: responsiveWidth(35),
+        // resizeMode: 'contain',
+        resizeMode: 'cover',
     },
     textContainer: {
-        marginLeft: responsiveWidth(4),
+        // marginLeft: responsiveWidth(2),
         flex: 1,
     },
     text: {
-        fontSize: responsiveFontSize(1.6),
-        marginBottom: responsiveHeight(0.5),
+        fontSize: responsiveFontSize(1.8),
+        // marginBottom: responsiveHeight(0.5),
         color: 'black',
         fontWeight: '400',
+        textTransform: 'capitalize'
     },
     noDataText: {
         marginTop: responsiveHeight(2),
@@ -287,19 +353,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     noDataContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
         flex: 1,
         padding: responsiveWidth(4),
+        alignItems: 'center'
     },
     noDataImage: {
         width: responsiveWidth(60),
         height: responsiveWidth(60),
         resizeMode: 'contain',
+        marginVertical: responsiveHeight(5)
     },
-    noDataText: {
-        fontSize: responsiveFontSize(1.8),
-        color: '#666',
-        marginTop: responsiveHeight(2),
+    contentContainer: {
     }
+
 });

@@ -19,6 +19,7 @@ import GeneralTerms from './policies/GeneralTerms';
 import PrivacyPolicy from './policies/PrivacyPolicy';
 import DisclaimerPolicy from './policies/DisclaimerPolicy';
 import CustumerSupport from './policies/CustumerSupport';
+import Help from '../Help';
 // import CameraTaking from './complain/claim/CameraTaking';
 
 const Stack = createNativeStackNavigator();
@@ -37,27 +38,29 @@ const AppNavigator = () => {
 
   return (
     // <NavigationContainer linking={linking}>
-      <Stack.Navigator initialRouteName="SplashScreen">
-        <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
-        <Stack.Screen name="PhoneNoScreen" component={PhoneNoScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="OtpScreen" component={OtpScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
-        <Stack.Screen name="ClaimForm" component={ClaimForm} options={{ headerShown: false }} />
-        <Stack.Screen name="ClaimHistory" component={ClaimHistory} options={{ headerShown: false }} />
-        <Stack.Screen name="SearchStatus" component={SearchStatus} options={{ headerShown: false }} />
-        <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-        <Stack.Screen name="LoginDashboard" component={LoginDashboard} options={{ headerShown: false }} />
-        <Stack.Screen name="Loginphone" component={Loginphone} options={{ headerShown: false }} />
-        <Stack.Screen name="UpdateProfile" component={UpdateProfile} options={{ headerShown: false }} />
-        <Stack.Screen name="AddProduct" component={AddProduct} options={{ headerShown: false }} />
-        <Stack.Screen name="GeneralTerms" component={GeneralTerms} options={{ headerShown: false }} />
-        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{ headerShown: false }} />
-        <Stack.Screen name="DisclaimerPolicy" component={DisclaimerPolicy} options={{ headerShown: false }} />
-        <Stack.Screen name="CustumerSupport" component={CustumerSupport} options={{ headerShown: false }} />
-      </Stack.Navigator>
-//  </NavigationContainer>
+    <Stack.Navigator initialRouteName="SplashScreen">
+      <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+      <Stack.Screen name="PhoneNoScreen" component={PhoneNoScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="OtpScreen" component={OtpScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
+      <Stack.Screen name="ClaimForm" component={ClaimForm} options={{ headerShown: false }} />
+      <Stack.Screen name="ClaimHistory" component={ClaimHistory} options={{ headerShown: false }} />
+      <Stack.Screen name="SearchStatus" component={SearchStatus} options={{ headerShown: false }} />
+      <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+      <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+      <Stack.Screen name="LoginDashboard" component={LoginDashboard} options={{ headerShown: false }} />
+      <Stack.Screen name="Loginphone" component={Loginphone} options={{ headerShown: false }} />
+      <Stack.Screen name="UpdateProfile" component={UpdateProfile} options={{ headerShown: false }} />
+      <Stack.Screen name="AddProduct" component={AddProduct} options={{ headerShown: false }} />
+      <Stack.Screen name="GeneralTerms" component={GeneralTerms} options={{ headerShown: false }} />
+      <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{ headerShown: false }} />
+      <Stack.Screen name="DisclaimerPolicy" component={DisclaimerPolicy} options={{ headerShown: false }} />
+      <Stack.Screen name="CustumerSupport" component={CustumerSupport} options={{ headerShown: false }} />
+      <Stack.Screen name="Help" component={Help} options={{ headerShown: false }} />
+
+    </Stack.Navigator>
+    //  </NavigationContainer>
   );
 }
 

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { useSelector } from 'react-redux';
 export default function SplashScreen({ navigation }) {
-
   const user = useSelector(state => state.user.user);
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -14,20 +13,18 @@ export default function SplashScreen({ navigation }) {
     };
     checkLoginStatus();
   }, [navigation]);
-
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../Images/logo.png')}
+        source={require('../../Images/BTIcon.png')}
         style={styles.logo}
         resizeMode="contain"
       />
-      <Text style={styles.heading}>Welcome to Our App</Text>
-      <Text style={styles.text}>Loading...</Text>
+      {/* <Text style={styles.heading}>Welcome to Our App</Text>
+      <Text style={styles.text}>Loading...</Text> */}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -36,8 +33,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   logo: {
-    width: 200,
-    height: 200,
+    width: 120,
+    height: 120,
     marginBottom: 30,
   },
   heading: {

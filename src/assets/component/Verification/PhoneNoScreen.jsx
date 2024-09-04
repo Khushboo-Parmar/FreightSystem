@@ -26,28 +26,28 @@ const PhoneNoScreen = () => {
       const data = await response.json();
 
       if (response.status === 200) {
-
         dispatch(setPhoneNumber(phoneNumberinput));
         Toast.show({
-          type: 'success',
-          text1: 'Verification code sent successfully!',
+            type: 'success',
+            text1: 'Verification code sent successfully.',
+            text2: 'Please check your messages to proceed.',
         });
         navigation.navigate('OtpScreen');
-      }
-      else if (response.status === 400 && data.message === "Phone number already exists.") {
+    } else if (response.status === 400 && data.message === "Phone number already exists.") {
+        Toast.show({
+            type: 'error',
+            text1: 'Phone number already exists.',
+            text2: 'Please proceed to login.',
+        });
         navigation.navigate('Loginphone');
+    } else {
         Toast.show({
-          type: 'error',
-          text1: 'Phone number already exists',
-          text2: 'Go for login',
+            type: 'error',
+            text1: 'Failed to send verification code.',
+            text2: 'Please try again later.',
         });
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Failed to send verification code',
-          text2: 'Please try again.',
-        });
-      }
+    }
+    
     } catch (error) {
       console.error('Error sending verification code:', error);
       Toast.show({
@@ -64,12 +64,17 @@ const PhoneNoScreen = () => {
         {/* <FontAwesome name="arrow-left" size={responsiveFontSize(2)} color="black" /> */}
         <FontAwesome name="chevron-left" size={responsiveFontSize(2)} color="black" />
       </TouchableOpacity>
-      <Image style={styles.logo} source={require('../../Images/logoWithoutbg.png')} />
+
+      <View style={{alignItems:'center'}}>
+           <Image style={[styles.bgImagelogin,{alignItems:'center',       height: responsiveWidth(25),
+        width: responsiveWidth(25),}]} source={require('../../Images/BTIcon.png')} />
+           </View>
       {/* <Text style={styles.label}>Verify your phone number</Text> */}
-      <Text style={styles.label}>Register your phone number</Text>
-      <Text style={styles.label2}>Please enter your mobile number to receive a verification code </Text>
-      <Text style={styles.labelphone}>
-        <Icon name="user" size={20} color="#ee1d23" /> {' '}Phone Number:
+     <View>
+     <Text style={styles.label}>Register your phone number</Text>
+      <Text style={styles.label2}>Please enter your mobile number to receive a {'\n'} verification code </Text>
+      <Text style={[styles.labelphone,{textAlign:'center',marginBottom:responsiveHeight(3)}]}>
+        <Icon name="user" size={18} color="#ee1d23" /> {' '}Enter The Phone Number
       </Text>
       <TextInput
         style={styles.input}
@@ -79,10 +84,12 @@ const PhoneNoScreen = () => {
         value={phoneNumberinput}
         autoCapitalize="none"
       />
-      <TouchableOpacity onPress={sendVerificationCode} style={styles.sendBtn}>
-        <Icon name="send" size={20} color="#fff" />
+            <TouchableOpacity onPress={sendVerificationCode} style={styles.sendBtn}>
+        <Icon name="send" size={15} color="#fff" />
         <Text style={styles.sendBtnText}>SEND OTP</Text>
       </TouchableOpacity>
+     </View>
+
     </View>
   );
 };
@@ -93,6 +100,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: responsiveWidth(5),
     backgroundColor: '#fff',
+    gap:responsiveHeight(13)
   },
   logo: {
     width: responsiveWidth(50),
@@ -102,10 +110,11 @@ const styles = StyleSheet.create({
     marginBottom: responsiveHeight(3),
   },
   label: {
-    fontSize: responsiveFontSize(2.5),
+    fontSize: responsiveFontSize(2.8),
     textAlign: 'center',
     color: 'black',
     fontWeight: 'bold',
+    marginBottom:responsiveHeight(1)
   },
   labelphone: {
     fontSize: responsiveFontSize(2),
@@ -114,7 +123,7 @@ const styles = StyleSheet.create({
     fontWeight: "600"
   },
   label2: {
-    fontSize: responsiveFontSize(1.8),
+    fontSize: responsiveFontSize(1.5),
     marginBottom: responsiveHeight(4),
     textAlign: 'center',
     color: 'grey',
@@ -158,7 +167,7 @@ const styles = StyleSheet.create({
   },
   sendBtnText: {
     color: '#fff',
-    fontSize: responsiveFontSize(2),
+    fontSize: responsiveFontSize(1.7),
     marginLeft: 8,
   },
   backButton: {

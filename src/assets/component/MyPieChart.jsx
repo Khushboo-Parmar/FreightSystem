@@ -71,12 +71,10 @@ const MyPieChart = () => {
                     ];
                     setData(newData);
                 } else {
-                    // alert(result.message || 'Failed to fetch status counts');
                     ToastAndroid.show('Failed to fetch status counts', ToastAndroid.SHORT);
                 }
             } catch (error) {
                 console.error('Error fetching status counts:', error);
-                // alert('An error occurred while fetching the status counts');
                 ToastAndroid.show('An error occurred while fetching the status counts', ToastAndroid.SHORT);
       
             }
@@ -108,7 +106,7 @@ const MyPieChart = () => {
                 style={styles.pieChart}
                 hasLegend={false}
             />
-            <View style={styles.customLegend}>
+            <View style={[styles.customLegend,{flexDirection:'row',alignItems:'center',justifyContent:'center',gap:responsiveWidth(6)}]}>
                 {data.map((item, index) => (
                     <View key={index} style={styles.legendItem}>
                         <View style={[styles.legendColorBox, { backgroundColor: item.color }]} />
@@ -133,21 +131,19 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     legendColorBox: {
-        width: responsiveWidth(4),
-        height: responsiveWidth(4),
-        marginRight: responsiveWidth(2),
+        width: responsiveWidth(2.5),
+        height: responsiveWidth(2.5),
         borderRadius: responsiveWidth(2),
     },
     legendText: {
-        fontSize: responsiveFontSize(2),
+        fontSize: responsiveFontSize(1.8),
         color: 'black',
         marginLeft: responsiveWidth(2),
+        fontWeight:'bold'
     },
     customLegend: {
         flexDirection: 'column',
-        // alignItems: 'center',
         alignItems: 'flex-start',
-        marginLeft: responsiveWidth(5), // Add some margin to align with pie chart
     },
 });
 

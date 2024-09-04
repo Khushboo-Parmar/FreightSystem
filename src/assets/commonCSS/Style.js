@@ -48,8 +48,6 @@ export const s = StyleSheet.create({
         color:'white',
         letterSpacing:0.5,
         // alignItems:'center',
-       
-        
     },
     label: {
         fontSize: responsiveFontSize(2),

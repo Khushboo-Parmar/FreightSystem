@@ -66,7 +66,7 @@ const CustomDrawerContent = (props) => {
   };
   
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 ,paddingHorizontal:responsiveWidth(2)}}>
       <DrawerContentScrollView {...props}>
         <View style={styles.logoContainer}>
           <Image
@@ -75,7 +75,6 @@ const CustomDrawerContent = (props) => {
           />
         </View>
         <DrawerItems />
-
       </DrawerContentScrollView>
     </View>
   );
